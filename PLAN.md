@@ -1,8 +1,8 @@
 # MIGRATIONS-PLAN: Yabai → Aerospace + Sketchybar
 
-**Status:** Phase 1 - Abgeschlossen ✅ | Bereit für Phase 2
-**Letzte Aktualisierung:** 2025-11-11
-**Aktueller Schritt:** Phase 2 - Aerospace Installation
+**Status:** Phase 2 - IN PROGRESS ⚠️ (Troubleshooting)
+**Letzte Aktualisierung:** 2025-11-11 11:00
+**Aktueller Schritt:** Phase 2.2 - Displays Separate Spaces Problem
 
 ---
 
@@ -12,7 +12,7 @@
 |-------|--------|--------------|------|
 | 0 | ✅ COMPLETED | Vorbereitung & Dokumentation | 1h |
 | 1 | ✅ COMPLETED | Backup & Safety | 30min |
-| 2 | ⚪ PENDING | Aerospace Installation | 30min |
+| 2 | 🟡 IN PROGRESS | Aerospace Installation | 30min+ |
 | 3 | ⚪ PENDING | Config-Migration | 2-3h |
 | 4 | ⚪ PENDING | Sketchybar Anpassung | 1-2h |
 | 5 | ⚪ PENDING | Scripts Migration | 2-3h |
@@ -215,9 +215,10 @@ Phase 2: Aerospace Installation
 
 ---
 
-## PHASE 2: AEROSPACE INSTALLATION ⚪
+## PHASE 2: AEROSPACE INSTALLATION 🟡
 
-**Status:** PENDING
+**Status:** IN PROGRESS - Troubleshooting
+**Beginn:** 2025-11-11 10:30
 **Voraussetzungen:** Phase 1 abgeschlossen, Backups verifiziert
 
 ### 2.1 Installation
@@ -230,9 +231,26 @@ brew install --cask nikitabobko/tap/aerospace
 aerospace --version
 ```
 
-### 2.2 Accessibility Permissions
+### 2.2 Displays Separate Spaces (KRITISCH!)
+
+**⚠️ ERFORDERLICH:** Aerospace benötigt separate Spaces pro Display!
 
 **Manuell durchführen:**
+1. System Settings öffnen
+2. Desktop & Dock
+3. Mission Control section scrollen
+4. **Aktivieren:** ☑ "Displays have separate Spaces"
+5. **SYSTEM NEU STARTEN** (zwingend erforderlich!)
+
+**Fehler falls nicht aktiviert:**
+```
+AeroSpace Runtime Error
+Displays have separate spaces: false
+```
+
+### 2.3 Accessibility Permissions
+
+**Manuell durchführen (NACH Neustart):**
 1. System Settings öffnen
 2. Privacy & Security → Accessibility
 3. Aerospace in Liste finden
@@ -240,7 +258,7 @@ aerospace --version
 
 **⚠️ WICHTIG:** Nach jedem Aerospace-Update muss Permission OFF/ON getoggled werden!
 
-### 2.3 LaunchAgent prüfen
+### 2.4 LaunchAgent prüfen
 
 ```bash
 # LaunchAgent sollte automatisch erstellt werden
@@ -253,7 +271,7 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.nikitabobko.aerospac
 launchctl list | grep aerospace
 ```
 
-### 2.4 Erste Config (Minimal)
+### 2.5 Erste Config (Minimal)
 
 ```bash
 # Minimal-Config für Test
@@ -288,14 +306,50 @@ aerospace reload-config
 3. Warten bis 2× Bootsound / Apfel-Logo 2×
 4. Tasten loslassen
 
+### Aktueller Stand Phase 2 (2025-11-11 11:00)
+
+**✅ Erfolgreich durchgeführt:**
+- [x] Aerospace 0.19.2-Beta installiert
+- [x] Minimal-Config erstellt (`~/.aerospace.toml`)
+- [x] Alte Config-Konflikte bereinigt (`.config/aerospace/aerospace.toml.old-backup`)
+- [x] Aerospace-Prozess läuft (PID 13588)
+
+**⚠️ AKTUELLES PROBLEM: Displays Separate Spaces**
+
+**Symptom:**
+```
+AeroSpace Runtime Error
+Displays have separate spaces: false
+Monitor count: 2
+```
+
+**Status:**
+- macOS Einstellung: ✅ "Monitore verwenden verschiedene Spaces" = AKTIVIERT
+- Aerospace erkennt: ❌ `false`
+
+**Vermutete Ursache:**
+- macOS Sequoia (26.0.1) + Aerospace 0.19.2-Beta Disconnect
+- Multi-Monitor-Setup (2 Displays)
+- Einstellung war bereits aktiviert, aber nicht wirksam
+
+**Geplante Lösung:**
+1. Toggle: Einstellung OFF → ON
+2. System neu starten
+3. Aerospace testen nach Neustart
+4. Falls weiterhin Problem: Aerospace Docs/Issues checken oder Rollback erwägen
+
+**Zusätzliche Probleme behoben:**
+- [x] Config-Konflikt: Doppelte Config-Files (beide gefunden, eine umbenannt)
+- [x] Accessibility Permission: Noch nicht getestet (wartet auf Neustart)
+
 ### Checkliste Phase 2
 
-- [ ] Aerospace installiert
-- [ ] Accessibility aktiviert
-- [ ] LaunchAgent läuft
-- [ ] Minimal-Config funktioniert
-- [ ] Test-Shortcuts (alt-h/l) funktionieren
-- [ ] Keine SIP-Änderung nötig
+- [x] Aerospace installiert (0.19.2-Beta)
+- [ ] Accessibility aktiviert (nach Neustart zu prüfen)
+- [ ] LaunchAgent läuft (nach Neustart zu prüfen)
+- [ ] Minimal-Config funktioniert (blockiert durch Separate Spaces)
+- [ ] Test-Shortcuts (alt-h/l) funktionieren (blockiert)
+- [x] Keine SIP-Änderung nötig (bestätigt)
 
 ---
 
