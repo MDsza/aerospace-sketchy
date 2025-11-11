@@ -1,0 +1,263 @@
+# AeroSpace Config - Production Version
+# Version: 1.0 (Phase 3)
+# Date: 2025-11-11
+# Migrated from Yabai+SKHD to Aerospace
+# Karabiner: CapsLock → Hyper (⌃⌥⇧), CapsLock+Cmd → Hyper+ (⌃⌥⇧⌘)
+
+# ============================================================================
+# GENERAL SETTINGS
+# ============================================================================
+
+start-at-login = true
+
+# Default layout
+default-root-container-layout = 'tiles'
+default-root-container-orientation = 'auto'
+
+# Enable normalization for consistent layouts
+enable-normalization-flatten-containers = true
+enable-normalization-opposite-orientation-for-nested-containers = true
+
+# Accordion padding (for accordion mode)
+accordion-padding = 30
+
+# ============================================================================
+# SKETCHYBAR INTEGRATION
+# ============================================================================
+
+# Start Sketchybar after Aerospace
+after-startup-command = ['exec-and-forget sketchybar']
+
+# Trigger Sketchybar on workspace change
+exec-on-workspace-change = [
+    '/bin/bash', '-c',
+    'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
+]
+
+# ============================================================================
+# GAPS (Sketchybar Integration)
+# ============================================================================
+
+[gaps]
+inner.horizontal = 0
+inner.vertical = 0
+outer.left = 0
+outer.bottom = 30    # SKETCHYBAR_HEIGHT
+outer.top = 0
+outer.right = 0
+
+# ============================================================================
+# WORKSPACES (Hybrid: 1-9 + C/M/B/E/T)
+# ============================================================================
+
+# Workspace names available: 1-9, C, M, B, E, T
+# C = Code (VS Code, Terminal, IDEs)
+# M = Music (Spotify, iTunes, Audio)
+# B = Browser (Safari, Firefox, Chrome)
+# E = Email (Mail.app, Outlook)
+# T = Terminal (dediziert Shell-Sessions)
+
+# ============================================================================
+# KEYBOARD SHORTCUTS
+# ============================================================================
+
+[mode.main.binding]
+
+# ----------------------------------------------------------------------------
+# FOCUS (Hyper + Arrow Keys)
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-left = 'focus left'
+ctrl-alt-shift-right = 'focus right'
+ctrl-alt-shift-up = 'focus up'
+ctrl-alt-shift-down = 'focus down'
+
+# Alternative: Vim-Keys (Hyper + h/j/k/l)
+ctrl-alt-shift-h = 'focus left'
+ctrl-alt-shift-j = 'focus down'
+ctrl-alt-shift-k = 'focus up'
+ctrl-alt-shift-l = 'focus right'
+
+# ----------------------------------------------------------------------------
+# SWAP WINDOWS (Hyper+ + Arrow Keys)
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-cmd-left = 'move left'
+ctrl-alt-shift-cmd-right = 'move right'
+ctrl-alt-shift-cmd-up = 'move up'
+ctrl-alt-shift-cmd-down = 'move down'
+
+# Alternative: Vim-Keys (Hyper+ + h/j/k/l)
+ctrl-alt-shift-cmd-h = 'move left'
+ctrl-alt-shift-cmd-j = 'move down'
+ctrl-alt-shift-cmd-k = 'move up'
+ctrl-alt-shift-cmd-l = 'move right'
+
+# ----------------------------------------------------------------------------
+# WORKSPACE NAVIGATION (Hyper + Number/Letter)
+# ----------------------------------------------------------------------------
+
+# Numbers 1-9
+ctrl-alt-shift-1 = 'workspace 1'
+ctrl-alt-shift-2 = 'workspace 2'
+ctrl-alt-shift-3 = 'workspace 3'
+ctrl-alt-shift-4 = 'workspace 4'
+ctrl-alt-shift-5 = 'workspace 5'
+ctrl-alt-shift-6 = 'workspace 6'
+ctrl-alt-shift-7 = 'workspace 7'
+ctrl-alt-shift-8 = 'workspace 8'
+ctrl-alt-shift-9 = 'workspace 9'
+
+# Letters (Hybrid Workspaces)
+ctrl-alt-shift-c = 'workspace C'    # Code
+ctrl-alt-shift-m = 'workspace M'    # Music
+ctrl-alt-shift-b = 'workspace B'    # Browser
+ctrl-alt-shift-e = 'workspace E'    # Email
+ctrl-alt-shift-t = 'workspace T'    # Terminal
+
+# Circular Navigation (Hyper + J/L wie bei Yabai)
+# J = Previous, L = Next
+ctrl-alt-shift-semicolon = 'workspace --wrap-around next'   # Hyper + ; (neben L)
+# Note: 'j' bereits für focus down verwendet, verwende Semicolon für next
+
+# ----------------------------------------------------------------------------
+# MOVE WINDOW TO WORKSPACE (Hyper+ + Number/Letter)
+# ----------------------------------------------------------------------------
+
+# Numbers 1-9
+ctrl-alt-shift-cmd-1 = 'move-node-to-workspace 1'
+ctrl-alt-shift-cmd-2 = 'move-node-to-workspace 2'
+ctrl-alt-shift-cmd-3 = 'move-node-to-workspace 3'
+ctrl-alt-shift-cmd-4 = 'move-node-to-workspace 4'
+ctrl-alt-shift-cmd-5 = 'move-node-to-workspace 5'
+ctrl-alt-shift-cmd-6 = 'move-node-to-workspace 6'
+ctrl-alt-shift-cmd-7 = 'move-node-to-workspace 7'
+ctrl-alt-shift-cmd-8 = 'move-node-to-workspace 8'
+ctrl-alt-shift-cmd-9 = 'move-node-to-workspace 9'
+
+# Letters (Hybrid Workspaces)
+ctrl-alt-shift-cmd-c = 'move-node-to-workspace C'    # Code
+ctrl-alt-shift-cmd-m = 'move-node-to-workspace M'    # Music
+ctrl-alt-shift-cmd-b = 'move-node-to-workspace B'    # Browser
+ctrl-alt-shift-cmd-e = 'move-node-to-workspace E'    # Email
+ctrl-alt-shift-cmd-t = 'move-node-to-workspace T'    # Terminal
+
+# ----------------------------------------------------------------------------
+# LAYOUTS (Hyper + K = Toggle)
+# ----------------------------------------------------------------------------
+# NOTE: k already used for focus up, using different key
+# ctrl-alt-shift-k = 'layout tiles horizontal vertical'   # Conflict!
+
+# Rotation (Hyper + , / .)
+ctrl-alt-shift-comma = 'layout tiles vertical horizontal'   # Hyper + ,
+ctrl-alt-shift-period = 'layout tiles horizontal vertical'  # Hyper + .
+
+# Balance (Hyper+ + K) - Using 'o' instead since k is focus
+ctrl-alt-shift-cmd-o = 'balance-sizes'                      # Hyper+ + O (changed from K)
+
+# ----------------------------------------------------------------------------
+# FULLSCREEN & FLOAT (Hyper + Return / Hyper+ + Return)
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-enter = 'fullscreen'                         # Hyper + Return
+ctrl-alt-shift-cmd-enter = 'layout floating tiling'         # Hyper+ + Return (Float toggle)
+
+# ----------------------------------------------------------------------------
+# DISPLAY MANAGEMENT (Hyper + I/O)
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I (circular)
+
+# All windows to next display (Hyper + O) - TODO: Benötigt Script oder Workaround
+# Aerospace hat kein "move all windows" command, nur einzelne
+
+# ----------------------------------------------------------------------------
+# SYSTEM / SERVICES
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-backslash = 'reload-config'                  # Hyper + \
+
+# ----------------------------------------------------------------------------
+# WINDOW SIZING (Hyper+ + M = Small in corner)
+# ----------------------------------------------------------------------------
+# TODO: Aerospace hat kein Grid-System wie Yabai
+# Alternative: resize commands nutzen
+
+# ============================================================================
+# WINDOW RULES
+# ============================================================================
+
+# System Settings (Floating)
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+# Raycast Settings (Floating)
+[[on-window-detected]]
+if.app-id = 'com.raycast.macos'
+if.window-title-regex-substring = 'Settings'
+run = 'layout floating'
+
+# Karabiner-Elements (Floating)
+[[on-window-detected]]
+if.app-id = 'org.pqrs.Karabiner-Elements.Settings'
+run = 'layout floating'
+
+# Bartender 5 (Floating)
+[[on-window-detected]]
+if.app-id = 'com.surteesstudios.Bartender'
+run = 'layout floating'
+
+# CleanShot X (Floating)
+[[on-window-detected]]
+if.app-id = 'pl.maketheweb.cleanshotx'
+run = 'layout floating'
+
+# ============================================================================
+# APP-SPECIFIC WORKSPACE ASSIGNMENTS (COMMENTED OUT for now)
+# ============================================================================
+
+# NOTE: Auto-assignment disabled initially, enable manually per app as needed
+# Reason: May interfere with manual workspace management
+
+# # Workspace C: Code
+# [[on-window-detected]]
+# if.app-id = 'com.microsoft.VSCode'
+# run = 'move-node-to-workspace C'
+
+# # Workspace M: Music
+# [[on-window-detected]]
+# if.app-id = 'com.spotify.client'
+# run = 'move-node-to-workspace M'
+
+# # Workspace B: Browser
+# [[on-window-detected]]
+# if.app-id = 'com.apple.Safari'
+# run = 'move-node-to-workspace B'
+
+# # Workspace E: Email
+# [[on-window-detected]]
+# if.app-id = 'com.apple.mail'
+# run = 'move-node-to-workspace E'
+
+# # Workspace T: Terminal
+# [[on-window-detected]]
+# if.app-id = 'com.apple.Terminal'
+# run = 'move-node-to-workspace T'
+
+# ============================================================================
+# NOTES
+# ============================================================================
+
+# Migration Notes:
+# - Yabai "Space Explosion" (Hyper + D) → Nicht direkt portierbar, Layout-Logik anders
+# - Yabai "Space Implosion" (Hyper+ + D) → Nicht direkt portierbar
+# - Window Shadows Toggle (Hyper+ + S) → Nicht verfügbar in Aerospace
+# - Fix Space Associations (Hyper+ + F) → Nicht nötig (virtuelle Workspaces)
+# - YabaiIndicator restart (Hyper + \) → Durch reload-config ersetzt
+
+# Differences from Yabai:
+# - Workspaces sind virtuell (nicht native macOS Spaces)
+# - Layouts: tiles/accordion statt BSP/Stack
+# - Balance ist explicit command, nicht automatisch
+# - Kein Grid-System für Window-Positioning
+
+# Future TODOs:
+# - Hyper + O (all windows to display) → Script entwickeln
+# - Hyper+ + M (small window in corner) → Script oder resize commands
+# - Mission Control Alternative (Hyper + Space) → Aerospace hat workspace-overview?

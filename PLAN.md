@@ -1,8 +1,8 @@
 # MIGRATIONS-PLAN: Yabai → Aerospace + Sketchybar
 
-**Status:** Phase 2 - ABGESCHLOSSEN ✅ | Bereit für Phase 3
-**Letzte Aktualisierung:** 2025-11-11 13:56
-**Aktueller Schritt:** Phase 3 - Config Migration (Hyper-Shortcuts)
+**Status:** Phase 3 - ABGESCHLOSSEN ✅ | Bereit für Phase 4
+**Letzte Aktualisierung:** 2025-11-11 14:05
+**Aktueller Schritt:** Phase 4 - Sketchybar Anpassung
 
 ---
 
@@ -13,7 +13,7 @@
 | 0 | ✅ COMPLETED | Vorbereitung & Dokumentation | 1h |
 | 1 | ✅ COMPLETED | Backup & Safety | 30min |
 | 2 | ✅ COMPLETED | Aerospace Installation | 3h |
-| 3 | ⚪ PENDING | Config-Migration | 2-3h |
+| 3 | ✅ COMPLETED | Config-Migration | 45min |
 | 4 | ⚪ PENDING | Sketchybar Anpassung | 1-2h |
 | 5 | ⚪ PENDING | Scripts Migration | 2-3h |
 | 6 | ⚪ PENDING | Deinstallation (Soft) | 30min |
@@ -409,9 +409,12 @@ Fenster müssen "clean" sein (kein WM) wenn neuer WM startet.
 
 ---
 
-## PHASE 3: CONFIG-MIGRATION ⚪
+## PHASE 3: CONFIG-MIGRATION ✅
 
-**Status:** PENDING
+**Status:** COMPLETED
+**Beginn:** 2025-11-11 13:20
+**Abgeschlossen:** 2025-11-11 14:05
+**Dauer:** ~45 Minuten
 **Voraussetzungen:** Phase 2 abgeschlossen, Aerospace läuft
 
 ### 3.1 Workspace-Setup (Hybrid)
@@ -490,14 +493,66 @@ outer.right = 0
 
 ### Checkliste Phase 3
 
-- [ ] aerospace.toml Draft erstellt
-- [ ] Alle Workspaces definiert (1-9, C, M, B, E, T)
-- [ ] Alle Shortcuts konvertiert (40+)
-- [ ] Window Rules portiert
-- [ ] App-Assignments konfiguriert
-- [ ] Gaps/Padding für Sketchybar
-- [ ] Config reviewed
-- [ ] aerospace reload-config erfolgreich
+- [x] aerospace.toml Production erstellt (260+ Zeilen)
+- [x] Alle Workspaces definiert (1-9, C, M, B, E, T)
+- [x] Alle Shortcuts konvertiert mit Hyper (ctrl-alt-shift)
+- [x] Window Rules portiert (System Settings, Raycast, Karabiner, etc.)
+- [x] App-Assignments vorbereitet (initial disabled)
+- [x] Gaps/Padding für Sketchybar (bottom = 30)
+- [x] Sketchybar Integration vorbereitet
+- [x] Config getestet und funktioniert
+- [x] Hyper-Key funktioniert (Karabiner 15.7.0)
+
+### Ergebnisse Phase 3
+
+**✅ PRODUCTION CONFIG ERFOLGREICH:**
+
+**Config-Datei:** `~/.aerospace.toml` (260+ Zeilen)
+- Gesichert in: `configs/aerospace.toml`
+
+**Implementierte Features:**
+1. **Hyper-Shortcuts (CapsLock = Karabiner)**
+   - Focus: Hyper + h/j/k/l oder Pfeile
+   - Swap: Hyper+ + h/j/k/l oder Pfeile
+   - Workspaces: Hyper + 1-9, C, M, B, E, T
+   - Move to Workspace: Hyper+ + 1-9, C, M, B, E, T
+
+2. **Workspace-System (Hybrid)**
+   - 1-9: Standard Workspaces
+   - C: Code (VS Code, IDEs)
+   - M: Music (Spotify)
+   - B: Browser (Safari, Firefox, Chrome)
+   - E: Email (Mail, Outlook)
+   - T: Terminal
+
+3. **Layouts**
+   - Fullscreen: Hyper + Enter
+   - Float Toggle: Hyper+ + Enter
+   - Rotation: Hyper + , / .
+   - Balance: Hyper+ + O
+
+4. **Window Rules**
+   - System Settings → Floating
+   - Raycast Settings → Floating
+   - Karabiner → Floating
+   - Bartender → Floating
+   - CleanShot X → Floating
+
+5. **Sketchybar Integration**
+   - `after-startup-command` configured
+   - `exec-on-workspace-change` trigger ready
+   - Gap bottom = 30 (SKETCHYBAR_HEIGHT)
+
+**User-Feedback:**
+> "Funktioniert bestens"
+
+**Nicht portierbare Features (dokumentiert):**
+- Space Explosion/Implosion (Hyper + D) - andere Layout-Logik
+- Window Shadows Toggle (Hyper+ + S) - nicht verfügbar
+- Fix Space Associations (Hyper+ + F) - nicht nötig
+- Grid-System für Window-Positioning - alternatives resize
+
+### Phase 3: ERFOLGREICH ABGESCHLOSSEN ✅
 
 ---
 
