@@ -1,8 +1,8 @@
 # MIGRATIONS-PLAN: Yabai → Aerospace + Sketchybar
 
-**Status:** Phase 3 - ABGESCHLOSSEN ✅ | Bereit für Phase 4
-**Letzte Aktualisierung:** 2025-11-11 14:05
-**Aktueller Schritt:** Phase 4 - Sketchybar Anpassung
+**Status:** Phase 4 - ABGESCHLOSSEN ✅ | Bereit für Phase 5
+**Letzte Aktualisierung:** 2025-11-11 19:05
+**Aktueller Schritt:** Phase 5 - Scripts Migration
 
 ---
 
@@ -14,7 +14,7 @@
 | 1 | ✅ COMPLETED | Backup & Safety | 30min |
 | 2 | ✅ COMPLETED | Aerospace Installation | 3h |
 | 3 | ✅ COMPLETED | Config-Migration | 45min |
-| 4 | ⚪ PENDING | Sketchybar Anpassung | 1-2h |
+| 4 | ✅ COMPLETED | Sketchybar Anpassung | 2.5h |
 | 5 | ⚪ PENDING | Scripts Migration | 2-3h |
 | 6 | ⚪ PENDING | Deinstallation (Soft) | 30min |
 | 7 | ⚪ PENDING | Testing & Validation | 1-2h |
@@ -556,9 +556,12 @@ outer.right = 0
 
 ---
 
-## PHASE 4: SKETCHYBAR ANPASSUNG ⚪
+## PHASE 4: SKETCHYBAR ANPASSUNG ✅
 
-**Status:** PENDING
+**Status:** COMPLETED
+**Beginn:** 2025-11-11 18:30
+**Abgeschlossen:** 2025-11-11 21:05
+**Dauer:** ~2.5 Stunden
 **Voraussetzungen:** Phase 3 abgeschlossen, Aerospace-Config funktioniert
 
 ### 4.1 Aerospace-Integration in Config
@@ -630,14 +633,97 @@ local workspace_icons = {
 
 ### Checkliste Phase 4
 
-- [ ] Aerospace-Integration in Config
-- [ ] Spaces Widget umgebaut
-- [ ] Event-Handler Script erstellt
-- [ ] Workspace-Labels definiert
-- [ ] Sketchybar zeigt korrekte Workspaces
-- [ ] Highlighting funktioniert
-- [ ] App-Icons werden angezeigt
-- [ ] Performance OK (keine Lags)
+- [x] Aerospace-Integration in Config (exec-on-workspace-change)
+- [x] Spaces Widget umgebaut (von "space" zu "item" Type)
+- [x] aerospace_batch.lua Helper erstellt
+- [x] Workspace-Labels definiert (SF Symbols für Kompatibilität)
+- [x] Sketchybar zeigt korrekte Workspaces (1-9, E, T, C, B, M)
+- [x] Highlighting funktioniert (sofort via Aerospace-Trigger)
+- [x] App-Icons werden angezeigt (sofort nach WS-Wechsel)
+- [x] Performance OK (keine Lags, kein 2s-Watcher nötig)
+- [x] Apple-Click-Handler auf Aerospace umgestellt
+- [x] Restart-Services Script auf Aerospace umgestellt
+
+### Erkenntnisse Phase 4
+
+**KRITISCH - Aerospace vs Yabai Space-Konzept verstanden:**
+
+**Problem 1: Space vs. Item Binding**
+```lua
+# FALSCH (Yabai-Ansatz):
+sbar.add("space", "space.1", { space = 1, ... })  # Bindet an macOS Space
+
+# RICHTIG (Aerospace-Ansatz):
+sbar.add("item", "space.1", { ... })  # Normale Items ohne Space-Binding
+```
+
+**Grund:** Aerospace nutzt virtuelle Workspaces, NICHT native macOS Spaces!
+- Alle Aerospace-Fenster sind aus macOS-Sicht in EINEM Space (meist Space 1)
+- Mission Control sieht nur 1 Space
+- Aerospace managed Fenster intern (versteckt/zeigt sie)
+
+**Problem 2: Fenster "verschwunden"**
+- **Root Cause:** Aerospace übernahm nur Fenster die NACH seinem Start geöffnet wurden
+- Alle VOR Aerospace gestarteten Apps blieben "unsichtbar"
+- **Lösung:** Apps aktivieren/fokussieren → Aerospace erkennt sie → übernimmt alle Fenster
+
+**Problem 3: Icons für Letter-Workspaces**
+- Unicode NerdFont Icons (󰨞, , ) funktionierten nicht zuverlässig
+- **Lösung:** SF Symbols verwenden (native macOS Icons, garantiert kompatibel)
+  - E = 􀍕 (envelope.fill)
+  - T = 􀩼 (app.terminal.fill)
+  - C = 􀤙 (chevron.left.forwardslash.chevron.right)
+  - B = 􀎬 (safari.fill)
+  - M = 􀑪 (play.fill)
+
+**Problem 4: Periodic Watcher unnötig**
+- **Ursprünglich:** 2s-Watcher zum Polling des aktuellen Workspace
+- **Erkenntnis:** Aerospace `exec-on-workspace-change` triggert SOFORT
+- Highlighting: SOFORT ✅
+- App-Icons: So schnell wie async query läuft
+- **Lösung:** Watcher entfernt, nur initial trigger on startup
+
+**Problem 5: Karabiner nach Restart nicht aktiv**
+- **Root Cause:** Kein LaunchAgent für Karabiner vorhanden
+- **Lösung:** Karabiner manuell starten, Login Items aktivieren
+
+**Problem 6: Apple-Icon Doppelklick startete noch Yabai**
+- **Root Cause:** Scripts noch mit `yabai --restart-service` codiert
+- **Lösung:**
+  - `restart_services.sh` auf Aerospace umgestellt
+  - `apple_click_handler.sh` Fallback gefixt
+  - Beide Scripts starten jetzt: `killall AeroSpace && open -a AeroSpace`
+
+### Ergebnis Phase 4
+
+**Funktioniert:**
+- ✅ 14 Workspaces korrekt angezeigt (1-9, E, T, C, B, M)
+- ✅ Workspace-Wechsel via Hyper-Shortcuts sofort
+- ✅ Active Workspace Highlighting sofort (fett)
+- ✅ App-Icons sofort nach Workspace-Wechsel
+- ✅ Click-to-Switch funktioniert
+- ✅ Doppelklick Apple-Icon → Aerospace Neustart
+- ✅ Alle Fenster von Aerospace verwaltet (17 Fenster)
+
+**Dateien erstellt/angepasst:**
+```
+configs/sketchybar/
+├── init.lua                          # aerospace_batch + Event hinzugefügt
+├── items/spaces.lua                  # Komplett neu (Items statt Spaces)
+├── helpers/aerospace_batch.lua       # NEU: Aerospace CLI Integration
+└── plugins/
+    ├── restart_services.sh           # Aerospace statt Yabai
+    └── apple_click_handler.sh        # Fallback gefixt
+```
+
+**Config-Symlink:**
+```bash
+~/.config/sketchybar → ~/MyCloud/TOOLs/aerospace+sketchy/configs/sketchybar
+```
+
+### Nächster Schritt
+
+Phase 5 starten: Scripts Migration (move-all-to-workspace, etc.)
 
 ---
 

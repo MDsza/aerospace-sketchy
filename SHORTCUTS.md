@@ -68,7 +68,7 @@ Yabai+SKHD → Aerospace Migration
 ### Fenster verschieben
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
-|----------|------------|-----------|--------|
+|----------|------------|-----------|--------|123
 | Zu vorherigem Workspace | Hyper+ + J | Hyper+ + J | ✅ GLEICH |
 | Zu nächstem Workspace | Hyper+ + L | Hyper+ + L | ✅ GLEICH |
 | Zu Workspace 1 | Hyper+ + 1 | Hyper+ + 1 | ✅ GLEICH |

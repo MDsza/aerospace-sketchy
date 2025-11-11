@@ -1,0 +1,10 @@
+#!/usr/bin/env lua
+
+-- Make sure Lua can resolve modules from the SketchyBar config directory
+local HOME = os.getenv("HOME")
+package.path = HOME .. "/.config/sketchybar/?.lua;" ..
+               HOME .. "/.config/sketchybar/?/init.lua;" .. package.path
+
+-- Load the sketchybar-package and prepare the helper binaries
+require("helpers")
+require("init")
