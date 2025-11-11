@@ -1,8 +1,8 @@
 # MIGRATIONS-PLAN: Yabai → Aerospace + Sketchybar
 
-**Status:** Phase 2 - IN PROGRESS ⚠️ (Troubleshooting)
-**Letzte Aktualisierung:** 2025-11-11 11:00
-**Aktueller Schritt:** Phase 2.2 - Displays Separate Spaces Problem
+**Status:** Phase 2 - FAST ABGESCHLOSSEN ✅ (Neustart erforderlich)
+**Letzte Aktualisierung:** 2025-11-11 13:25
+**Aktueller Schritt:** Sauberer Neustart mit Aerospace
 
 ---
 
@@ -345,11 +345,50 @@ Monitor count: 2
 ### Checkliste Phase 2
 
 - [x] Aerospace installiert (0.19.2-Beta)
-- [ ] Accessibility aktiviert (nach Neustart zu prüfen)
-- [ ] LaunchAgent läuft (nach Neustart zu prüfen)
-- [ ] Minimal-Config funktioniert (blockiert durch Separate Spaces)
-- [ ] Test-Shortcuts (alt-h/l) funktionieren (blockiert)
+- [x] Displays Separate Spaces aktiviert (Toggle OFF/ON half!)
+- [x] Config korrigiert (Layout-Keys vor [gaps])
+- [x] Server läuft und antwortet
+- [x] Commands funktionieren (list-workspaces, reload-config)
+- [x] Test-Shortcuts funktionieren (Alt + 1/2/3, Alt + h/l)
+- [x] Yabai+SKHD gestoppt für sauberen Neustart
+- [ ] Neustart durchgeführt (Aerospace übernimmt Fenster sauber)
 - [x] Keine SIP-Änderung nötig (bestätigt)
+
+### Erkenntnisse Phase 2
+
+**✅ ERFOLGREICH GELÖST:**
+1. **Displays Separate Spaces Problem:**
+   - Lösung: Toggle OFF → ON (KEIN Neustart nötig für Server-Start!)
+   - Server startete sofort nach Toggle
+
+2. **Config-Fehler:**
+   - `default-root-container-*` Keys waren in `[gaps]` statt davor
+   - Korrigiert: Keys vor `[gaps]` verschoben
+
+3. **Window Manager Konflikt identifiziert:**
+   - Aerospace + Yabai gleichzeitig = Bildfehler/Flimmern
+   - **ROOT CAUSE:** Yabai hatte Fenster bereits "managed"
+   - Aerospace versuchte gleiche Fenster zu übernehmen
+   - **LÖSUNG:** Yabai/SKHD stoppen → Neustart → Aerospace übernimmt clean
+
+**⚠️ WICHTIGE ERKENNTNIS:**
+Window Manager dürfen NICHT gleichzeitig laufen!
+Fenster müssen "clean" sein (kein WM) wenn neuer WM startet.
+
+### Nächster Schritt: SAUBERER NEUSTART
+
+**Vorbereitet:**
+- ✅ Yabai Service gestoppt
+- ✅ SKHD Service gestoppt
+- ✅ Aerospace Config korrekt (~/.aerospace.toml)
+- ✅ start-at-login = true (Aerospace startet automatisch)
+
+**NACH Neustart:**
+1. Aerospace startet automatisch
+2. Übernimmt alle Fenster von Anfang an
+3. Keine Konflikte, kein Flimmern
+4. Test: Alt + 1/2/3 Workspace-Wechsel smooth
+5. Wenn OK → Phase 2 COMPLETED ✅
 
 ---
 
