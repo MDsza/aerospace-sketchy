@@ -721,6 +721,56 @@ configs/sketchybar/
 ~/.config/sketchybar → ~/MyCloud/TOOLs/aerospace+sketchy/configs/sketchybar
 ```
 
+### 4.6 Monitor-Awareness Enhancement (Nachtrag)
+
+**Datum:** 2025-11-11 22:00-22:30
+**Dauer:** ~30 Minuten
+
+**User Request:** Sketchybar-Workspaces sollen nach Monitoren gruppiert werden (Built-in zuerst, dann External)
+
+**Implementierung:**
+
+1. **aerospace_batch.lua erweitert** mit `query_with_monitors()` Funktion
+   - Query monitors mit IDs/Namen
+   - Query workspaces mit Monitor-Assignment
+   - Query windows mit workspace+monitor Info
+
+2. **spaces.lua Fixed Order Approach:**
+   - **Built-in Monitor Workspaces:** E, T, C, B, M
+   - **Separator:** │ (vertikaler Bar)
+   - **External Monitor Workspaces:** 1-9
+
+   ```lua
+   local workspaces = {"E", "T", "C", "B", "M", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+   -- Separator wird nach "M" eingefügt
+   ```
+
+3. **Pragmatische Entscheidung:**
+   - KEINE dynamische Reorganisation bei Workspace-Movement zwischen Monitoren
+   - FIXED order basierend auf typischem Setup
+   - Letter-Workspaces = Konzeptuell Internal (E=Email, T=Terminal, etc.)
+   - Numeric Workspaces = Konzeptuell External (Haupt-Arbeitsbereich)
+
+**Vorteile Fixed Order:**
+- Einfacher zu maintainen (kein sbar.remove() benötigt)
+- Konsistente Reihenfolge (muscle memory)
+- Semantische Zuordnung (Letters vs Numbers)
+- Separator macht Gruppierung visuell klar
+
+**Testing:**
+- ✅ Alle 14 Workspaces vorhanden (E,T,C,B,M,1-9)
+- ✅ Separator zwischen M und 1
+- ✅ Workspace-Highlighting funktioniert
+- ✅ App-Icons werden korrekt angezeigt
+- ✅ Reihenfolge: `space.E, space.T, space.C, space.B, space.M, monitor_separator, space.1...space.9`
+
+**Dateien modifiziert:**
+```
+configs/sketchybar/
+├── helpers/aerospace_batch.lua    # query_with_monitors() hinzugefügt
+└── items/spaces.lua                # Fixed order E,T,C,B,M,│,1-9
+```
+
 ### Nächster Schritt
 
 Phase 5 starten: Scripts Migration (move-all-to-workspace, etc.)

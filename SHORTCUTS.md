@@ -137,6 +137,32 @@ Yabai+SKHD → Aerospace Migration
 3. `Hyper + U` → Fokus zum anderen Monitor wechseln
 4. `Hyper + J/L` → Workspace wechseln auf aktuellem Monitor
 
+### Sketchybar Monitor-Awareness ✅
+
+**Workspace-Gruppierung nach Monitor:**
+
+Sketchybar zeigt Workspaces gruppiert nach Monitor-Zuordnung an:
+
+```
+Built-in Monitor    │    External Monitor
+ [E] [T] [C] [B] [M] │ [1] [2] [3] [4] [5] [6] [7] [8] [9]
+```
+
+**Fixed Order Approach:**
+- **Letter Workspaces (E,T,C,B,M):** Built-in Retina Display
+- **Separator (│):** Visuelle Trennung
+- **Numeric Workspaces (1-9):** External Monitor (HP 738pu)
+
+**Vorteile:**
+- Sofort erkennbar, welche Workspaces zu welchem Monitor gehören
+- Separator macht Gruppierung visuell klar
+- Letter = Internal, Numbers = External (semantische Zuordnung)
+
+**Hinweis:**
+- Dies ist eine FIXED order basierend auf deinem typischen Setup
+- Wenn Workspaces zwischen Monitoren wandern (Hyper+ +U/P), bleibt die Sketchybar-Ordnung konstant
+- Pragmatischer Approach: Letter-Workspaces bleiben konzeptuell Internal (E=Email, T=Terminal, etc.)
+
 ---
 
 ### Workspace-Modi

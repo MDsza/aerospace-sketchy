@@ -6,8 +6,8 @@ local aerospace_batch = require("helpers.aerospace_batch")
 
 local spaces = {}
 
--- Hybrid workspace system: 1-9 + E/T/C/B/M (fixed order)
-local workspaces = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "E", "T", "C", "B", "M"}
+-- Fixed workspace order: Built-in monitor (E,T,C,B,M) first, then External monitor (1-9)
+local workspaces = {"E", "T", "C", "B", "M", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
 -- Workspace labels (for letter workspaces) - using SF Symbols for macOS compatibility
 local workspace_labels = {
@@ -18,6 +18,7 @@ local workspace_labels = {
   M = "􀑪"   -- Media (play.fill)
 }
 
+-- Create all workspace items
 for i, workspace_name in ipairs(workspaces) do
   -- IMPORTANT: Use "item" NOT "space" - Aerospace workspaces are virtual, not macOS Spaces
   local space = sbar.add("item", "space." .. workspace_name, {
@@ -54,6 +55,30 @@ for i, workspace_name in ipairs(workspaces) do
   })
 
   spaces[workspace_name] = space
+
+  -- Add monitor separator after letter workspaces (between Built-in and External)
+  if workspace_name == "M" then
+    sbar.add("item", "monitor_separator", {
+      position = "left",
+      icon = {
+        string = "│",  -- Vertical bar
+        color = colors.grey,
+        padding_left = 8,
+        padding_right = 8,
+        font = {
+          family = "SF Pro Display",
+          style = "Bold",
+          size = 16.0
+        }
+      },
+      label = { drawing = false },
+      background = {
+        color = colors.transparent,
+        drawing = false
+      },
+      width = 20
+    })
+  end
 
   -- Padding item
   sbar.add("item", "space.padding." .. workspace_name, {

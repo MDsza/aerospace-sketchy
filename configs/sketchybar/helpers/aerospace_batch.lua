@@ -99,6 +99,82 @@ function aerospace_batch:get_workspace_windows(batch_data, workspace_name, callb
   return workspace_windows
 end
 
+-- Batch query with monitor information
+function aerospace_batch:query_with_monitors(callback)
+  local now = os.time()
+  local batch_data = { timestamp = now }
+  local calls_remaining = 4
+
+  local function check_completion()
+    calls_remaining = calls_remaining - 1
+    if calls_remaining == 0 then
+      if callback then
+        callback(batch_data)
+      end
+    end
+  end
+
+  -- Query 1: All monitors
+  sbar.exec('aerospace list-monitors --format "%{monitor-id}|%{monitor-name}" 2>/dev/null', function(result)
+    batch_data.monitors = {}
+    if result and result ~= "" then
+      for line in result:gmatch("[^\r\n]+") do
+        local id, name = line:match("^(%d+)|(.+)$")
+        if id and name then
+          table.insert(batch_data.monitors, {
+            id = tonumber(id),
+            name = name:match("^%s*(.-)%s*$"),
+            is_builtin = name:match("Built%-in") ~= nil
+          })
+        end
+      end
+    end
+    check_completion()
+  end)
+
+  -- Query 2: All workspaces with monitor assignment
+  sbar.exec('aerospace list-workspaces --all --format "%{workspace}|%{monitor-id}|%{monitor-name}" 2>/dev/null', function(result)
+    batch_data.workspaces = {}
+    if result and result ~= "" then
+      for line in result:gmatch("[^\r\n]+") do
+        local workspace, monitor_id, monitor_name = line:match("^(.+)|(%d+)|(.+)$")
+        if workspace and monitor_id then
+          table.insert(batch_data.workspaces, {
+            name = workspace:match("^%s*(.-)%s*$"),
+            monitor_id = tonumber(monitor_id),
+            monitor_name = monitor_name and monitor_name:match("^%s*(.-)%s*$") or nil
+          })
+        end
+      end
+    end
+    check_completion()
+  end)
+
+  -- Query 3: Focused workspace
+  sbar.exec('aerospace list-workspaces --focused 2>/dev/null', function(result)
+    batch_data.focused_workspace = result and result:match("^%s*(.-)%s*$") or nil
+    check_completion()
+  end)
+
+  -- Query 4: All windows with workspace and monitor info
+  sbar.exec('aerospace list-windows --all --format "%{workspace}|%{app-name}|%{monitor-id}" 2>/dev/null', function(result)
+    batch_data.windows = {}
+    if result and result ~= "" then
+      for line in result:gmatch("[^\r\n]+") do
+        local workspace, app, monitor_id = line:match("^(.+)|(.+)|(%d+)$")
+        if workspace and app and monitor_id then
+          table.insert(batch_data.windows, {
+            workspace = workspace,
+            app = app,
+            monitor_id = tonumber(monitor_id)
+          })
+        end
+      end
+    end
+    check_completion()
+  end)
+end
+
 -- Force refresh cache (useful for events)
 function aerospace_batch:refresh()
   self.cache.timestamp = 0
