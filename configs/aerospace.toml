@@ -71,11 +71,10 @@ ctrl-alt-shift-right = 'focus right'
 ctrl-alt-shift-up = 'focus up'
 ctrl-alt-shift-down = 'focus down'
 
-# Alternative: Vim-Keys (Hyper + h/j/k/l)
+# Alternative: Vim-Keys (Hyper + h/k) - J/L für Workspace-Navigation reserviert
 ctrl-alt-shift-h = 'focus left'
-ctrl-alt-shift-j = 'focus down'
 ctrl-alt-shift-k = 'focus up'
-ctrl-alt-shift-l = 'focus right'
+# J/L: Workspace prev/next (siehe unten bei Workspace Navigation)
 
 # ----------------------------------------------------------------------------
 # SWAP WINDOWS (Hyper+ + Arrow Keys)
@@ -85,11 +84,10 @@ ctrl-alt-shift-cmd-right = 'move right'
 ctrl-alt-shift-cmd-up = 'move up'
 ctrl-alt-shift-cmd-down = 'move down'
 
-# Alternative: Vim-Keys (Hyper+ + h/j/k/l)
+# Alternative: Vim-Keys (Hyper+ + h/k) - J/L für Workspace-Move reserviert
 ctrl-alt-shift-cmd-h = 'move left'
-ctrl-alt-shift-cmd-j = 'move down'
 ctrl-alt-shift-cmd-k = 'move up'
-ctrl-alt-shift-cmd-l = 'move right'
+# J/L: Move window to workspace prev/next (siehe unten)
 
 # ----------------------------------------------------------------------------
 # WORKSPACE NAVIGATION (Hyper + Number/Letter)
@@ -113,10 +111,9 @@ ctrl-alt-shift-b = 'workspace B'    # Browser
 ctrl-alt-shift-e = 'workspace E'    # Email
 ctrl-alt-shift-t = 'workspace T'    # Terminal
 
-# Circular Navigation (Hyper + J/L wie bei Yabai)
-# J = Previous, L = Next
-ctrl-alt-shift-semicolon = 'workspace --wrap-around next'   # Hyper + ; (neben L)
-# Note: 'j' bereits für focus down verwendet, verwende Semicolon für next
+# Workspace Previous/Next (Hyper + J/L wie bei Yabai)
+ctrl-alt-shift-j = 'workspace --wrap-around prev'   # Previous Workspace
+ctrl-alt-shift-l = 'workspace --wrap-around next'   # Next Workspace
 
 # ----------------------------------------------------------------------------
 # MOVE WINDOW TO WORKSPACE (Hyper+ + Number/Letter)
@@ -140,6 +137,10 @@ ctrl-alt-shift-cmd-b = 'move-node-to-workspace B'    # Browser
 ctrl-alt-shift-cmd-e = 'move-node-to-workspace E'    # Email
 ctrl-alt-shift-cmd-t = 'move-node-to-workspace T'    # Terminal
 
+# Move window to Previous/Next Workspace (Hyper+ + J/L wie bei Yabai)
+ctrl-alt-shift-cmd-j = 'move-node-to-workspace --wrap-around prev'   # Previous
+ctrl-alt-shift-cmd-l = 'move-node-to-workspace --wrap-around next'   # Next
+
 # ----------------------------------------------------------------------------
 # LAYOUTS (Hyper + K = Toggle)
 # ----------------------------------------------------------------------------
@@ -160,12 +161,19 @@ ctrl-alt-shift-enter = 'fullscreen'                         # Hyper + Return
 ctrl-alt-shift-cmd-enter = 'layout floating tiling'         # Hyper+ + Return (Float toggle)
 
 # ----------------------------------------------------------------------------
-# DISPLAY MANAGEMENT (Hyper + I/O)
+# DISPLAY/MONITOR MANAGEMENT (Multi-Monitor Setup - Option 2: Dynamisch)
 # ----------------------------------------------------------------------------
-ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I (circular)
 
-# All windows to next display (Hyper + O) - TODO: Benötigt Script oder Workaround
-# Aerospace hat kein "move all windows" command, nur einzelne
+# WINDOW zu anderem Monitor verschieben
+ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I → Window to next monitor
+
+# FOCUS zwischen Monitoren wechseln (ohne Fenster zu verschieben)
+ctrl-alt-shift-u = 'focus-monitor --wrap-around prev'          # Hyper + U → Focus prev monitor
+ctrl-alt-shift-p = 'focus-monitor --wrap-around next'          # Hyper + P → Focus next monitor
+
+# WORKSPACE zwischen Monitoren verschieben (Option 2 - Dynamisch!)
+ctrl-alt-shift-cmd-u = 'move-workspace-to-monitor --wrap-around prev'  # Hyper+ + U → Move WS to prev monitor
+ctrl-alt-shift-cmd-p = 'move-workspace-to-monitor --wrap-around next'  # Hyper+ + P → Move WS to next monitor
 
 # ----------------------------------------------------------------------------
 # SYSTEM / SERVICES

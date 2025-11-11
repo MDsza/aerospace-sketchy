@@ -51,8 +51,8 @@ Yabai+SKHD → Aerospace Migration
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
-| Workspace Links | Hyper + J | Hyper + J | ✅ GLEICH |
-| Workspace Rechts | Hyper + L | Hyper + L | ✅ GLEICH |
+| Workspace Previous | Hyper + J | Hyper + J | ✅ GLEICH |
+| Workspace Next | Hyper + L | Hyper + L | ✅ GLEICH |
 | Workspace 1 | Hyper + 1 | Hyper + 1 | ✅ GLEICH |
 | Workspace 2 | Hyper + 2 | Hyper + 2 | ✅ GLEICH |
 | Workspace 3-9 | Hyper + [3-9] | Hyper + [3-9] | ✅ GLEICH |
@@ -68,7 +68,7 @@ Yabai+SKHD → Aerospace Migration
 ### Fenster verschieben
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
-|----------|------------|-----------|--------|123
+|----------|------------|-----------|--------|
 | Zu vorherigem Workspace | Hyper+ + J | Hyper+ + J | ✅ GLEICH |
 | Zu nächstem Workspace | Hyper+ + L | Hyper+ + L | ✅ GLEICH |
 | Zu Workspace 1 | Hyper+ + 1 | Hyper+ + 1 | ✅ GLEICH |
@@ -104,6 +104,41 @@ Yabai+SKHD → Aerospace Migration
 - Yabai nutzte nativen Mission Control
 - Aerospace hat eigenes Workspace-Overview (falls implementiert)
 
+---
+
+## MULTI-MONITOR MANAGEMENT
+
+**Konzept-Unterschied:**
+- **Yabai:** Jeder Monitor hat eigene Spaces (Mission Control) - z.B. Monitor 1: Space 1-10, Monitor 2: Space 11-20
+- **Aerospace:** Virtuelle Workspaces können zwischen Monitoren wandern (Option 2: Dynamisch)
+
+### Monitor-Operationen
+
+| Funktion | Yabai+SKHD | Aerospace | Status |
+|----------|------------|-----------|--------|
+| Window → Nächster Monitor | Hyper + I | Hyper + I | ✅ GLEICH |
+| Focus → Previous Monitor | ❌ N/A | **Hyper + U** | ✅ NEU |
+| Focus → Next Monitor | ❌ N/A | **Hyper + P** | ✅ NEU |
+| Workspace → Previous Monitor | ❌ N/A | **Hyper+ + U** | ✅ NEU |
+| Workspace → Next Monitor | ❌ N/A | **Hyper+ + P** | ✅ NEU |
+
+**✅ NEU in Aerospace:**
+- **Hyper + U/P:** Monitor-Fokus wechseln (ohne Fenster zu bewegen)
+- **Hyper+ + U/P:** Workspace zwischen Monitoren verschieben (KEY für dynamisches Multi-Monitor!)
+
+**⚠️ WICHTIG:**
+- Hyper+J/L wechselt Workspaces auf AKTUELLEM Monitor
+- Workspace "erscheint" wo du gerade fokussiert bist
+- Mit Hyper+ +U/P kannst du Workspace auf anderen Monitor verschieben
+
+**Beispiel-Workflow:**
+1. `Hyper + E` → Workspace E erscheint auf aktuellem Monitor
+2. `Hyper+ + P` → Workspace E wandert zu anderem Monitor
+3. `Hyper + U` → Fokus zum anderen Monitor wechseln
+4. `Hyper + J/L` → Workspace wechseln auf aktuellem Monitor
+
+---
+
 ### Workspace-Modi
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
@@ -115,19 +150,6 @@ Yabai+SKHD → Aerospace Migration
 **⚠️ Hyper + M Änderung:**
 - Aerospace erstellt Workspace automatisch bei move-to-non-existing
 - Maximieren via `fullscreen` command
-
----
-
-## DISPLAY-MANAGEMENT
-
-| Funktion | Yabai+SKHD | Aerospace | Status |
-|----------|------------|-----------|--------|
-| Fenster zu nächstem Display | Hyper + I | Hyper + I | ✅ GLEICH |
-| Alle Fenster zu nächstem Display | Hyper + O | Hyper + O | ✅ GLEICH |
-
-**Aerospace Commands:**
-- `move-node-to-monitor next` (zirkulär)
-- Funktioniert ähnlich wie Yabai
 
 ---
 
