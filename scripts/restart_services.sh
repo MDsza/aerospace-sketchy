@@ -1,28 +1,35 @@
 #!/bin/bash
-# Aerospace + Sketchybar Neustart (EMPFOHLENE METHODE - brew services)
+# Aerospace + Sketchybar Neustart (FUNKTIONIERENDE METHODE)
 
 # Zeige Benachrichtigung
 osascript -e 'display notification "Aerospace + Sketchybar werden neu gestartet..." with title "Aerospace Neustart"'
 
-# Force Kill Aerospace
-pkill -9 AeroSpace 2>/dev/null
+# Stoppe brew services ERST
+brew services stop sketchybar 2>/dev/null
 
-# EMPFOHLENE METHODE: brew services restart sketchybar
-# (verhindert Lock-File-Konflikte und Zombie-Prozesse)
-killall -9 sketchybar lua 2>/dev/null
+# Force Kill alles
+pkill -9 AeroSpace 2>/dev/null
+killall -9 sketchybar 2>/dev/null
+killall -9 lua 2>/dev/null
+pkill -9 -f "sketchybar" 2>/dev/null
+
+# Remove Lock-File
+rm -f /tmp/sketchybar_wolfgang.lock 2>/dev/null
 
 # Warte auf sauberes Beenden
-sleep 2
+sleep 3
 
-# Starte Sketchybar via brew services (EMPFOHLEN)
-brew services restart sketchybar
+# Starte neu via BREW SERVICES
+brew services start sketchybar
+
+# Warte auf vollständigen Sketchybar-Start
+sleep 3
 
 # Starte Aerospace neu
-sleep 1
 open -a AeroSpace
 
 # Warte auf vollständigen Start
-sleep 3
+sleep 2
 
 # Bestätigung
 osascript -e 'display notification "Aerospace + Sketchybar Neustart abgeschlossen!" with title "Aerospace Neustart"'
