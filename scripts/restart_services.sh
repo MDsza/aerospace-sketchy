@@ -1,35 +1,48 @@
 #!/bin/bash
-# Aerospace + Sketchybar Neustart (FUNKTIONIERENDE METHODE)
+# Aerospace + Sketchybar Neustart (FUNKTIONIERENDE METHODE - Direkter Start)
 
 # Zeige Benachrichtigung
-osascript -e 'display notification "Aerospace + Sketchybar werden neu gestartet..." with title "Aerospace Neustart"'
+osascript -e 'display notification "Aerospace + Sketchybar werden neu gestartet..." with title "Aerospace Neustart"' &
 
-# Stoppe brew services ERST
+# 1. Stoppe Services (falls läuft)
 brew services stop sketchybar 2>/dev/null
 
-# Force Kill alles
+# 2. Force Kill ALLES
 pkill -9 AeroSpace 2>/dev/null
 killall -9 sketchybar 2>/dev/null
 killall -9 lua 2>/dev/null
 pkill -9 -f "sketchybar" 2>/dev/null
 
-# Remove Lock-File
+# 3. Remove Lock-Files
 rm -f /tmp/sketchybar_wolfgang.lock 2>/dev/null
 
-# Warte auf sauberes Beenden
-sleep 3
+# 4. Warte bis WIRKLICH alles gestoppt (max 5 Sekunden)
+for i in {1..10}; do
+  PROCS=$(ps aux | grep -E '[s]ketchybar|[l]ua.*sketchybar' | wc -l)
+  if [ "$PROCS" -eq 0 ]; then
+    break
+  fi
+  sleep 0.5
+done
 
-# Starte neu via BREW SERVICES
-brew services start sketchybar
+# 5. Starte Sketchybar DIREKT (NICHT via brew services!)
+# WICHTIG: KEIN Redirect (> /dev/null), sonst lädt spaces.lua nicht!
+sketchybar &
 
-# Warte auf vollständigen Sketchybar-Start
-sleep 3
+# 6. Warte bis Sketchybar WIRKLICH läuft UND Workspaces geladen (max 10 Sekunden)
+for i in {1..20}; do
+  WORKSPACES=$(sketchybar --query bar 2>/dev/null | grep "space\." | wc -l | tr -d ' ')
+  if [ -n "$WORKSPACES" ] && [ "$WORKSPACES" -gt 10 ] 2>/dev/null; then
+    break
+  fi
+  sleep 0.5
+done
 
-# Starte Aerospace neu
+# 7. Starte Aerospace neu
 open -a AeroSpace
 
-# Warte auf vollständigen Start
-sleep 2
+# 8. Warte kurz
+sleep 1
 
-# Bestätigung
-osascript -e 'display notification "Aerospace + Sketchybar Neustart abgeschlossen!" with title "Aerospace Neustart"'
+# 9. Bestätigung
+osascript -e 'display notification "Aerospace + Sketchybar Neustart abgeschlossen!" with title "Aerospace Neustart"' &
