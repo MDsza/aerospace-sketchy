@@ -174,3 +174,58 @@ brew bundle install --file=Brewfile.backup
 3. **Karabiner nicht entfernen** (CapsLock-Mapping)
 4. **Soft-Disable Yabai/SKHD** vor Hard-Remove
 5. **Accessibility nach Aerospace-Update** neu aktivieren
+
+## 🔴 CRITICAL: Troubleshooting für Claude Code
+
+### Sketchybar Lock-File-Problem
+
+**WICHTIG für alle Sketchybar-Operationen:**
+
+#### Symptome
+- `could not acquire lock-file... already running?`
+- `could not initialize daemon! abort..`
+- Workspaces nicht sichtbar/klickbar/highlighted
+- Mehrere Lua-Prozesse laufen (3-5 statt 2)
+- Front_app Position falsch (links statt rechts nach G)
+
+#### Root Cause
+**Mehrfache Sketchybar-Neustart-Versuche → Zombie-Lua-Prozesse halten Lock-File**
+
+#### Lösung (IMMER VERWENDEN)
+```bash
+# Methode 1: Brew Services (EMPFOHLEN)
+killall -9 sketchybar lua 2>/dev/null
+sleep 2
+brew services restart sketchybar
+
+# Methode 2: Manuell (Fallback)
+pkill -9 sketchybar
+pkill -9 -f "lua.*sketchybar"
+rm -f /tmp/sketchybar_$USER.lock
+sleep 3
+sketchybar
+```
+
+#### Prävention
+1. **NIEMALS mehrfach hintereinander restarten!**
+2. **IMMER 3-5 Sekunden warten** zwischen Stop und Start
+3. **`aerospace reload-config` reicht NICHT** für Sketchybar-Updates
+4. **Prüfe Prozess-Count** nach Restart: `ps aux | grep -E '[s]ketchybar' | wc -l` → Erwartung: 2
+
+#### Vermeide Background-Commands
+- **NICHT:** `aerospace workspace A && sleep 1 && sketchybar --query...` (Background-Task)
+- **STATTDESSEN:** Einzelne synchrone Commands
+- Background-Tasks erzeugen Zombie-Prozesse → Lock-File-Konflikte
+
+### Performance bei großen Kontext-Größen
+- Continued-Sessions >40k Tokens → langsam
+- Viele Background-Tasks → Polling-Overhead
+- **Lösung:** Neue Session starten oder synchrone Commands verwenden
+
+### Wichtige Dateien
+- **Lock-File:** `/tmp/sketchybar_$USER.lock`
+- **Config:** `~/.config/sketchybar/` (NICHT `~/MyCloud/TOOLs/aerospace+sketchy/configs/`)
+- **front_app.lua:** MUSS `.disabled` sein (nicht aktiv!)
+- **Logs:** `/tmp/sketchybar_apple_handler.log`
+
+**📖 Vollständige Dokumentation:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)

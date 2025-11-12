@@ -213,7 +213,84 @@ aerospace+sketchy/
 
 ## Support & Troubleshooting
 
-### Häufige Probleme
+### 🆘 Vollständige Troubleshooting-Dokumentation
+
+**Siehe [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) für detaillierte Lösungen!**
+
+### Häufige Probleme (Quick Reference)
+
+#### 🔴 CRITICAL: Sketchybar Lock-File-Problem
+**Symptom:** `could not acquire lock-file... already running?` oder `could not initialize daemon! abort..`
+
+**Quick Fix:**
+```bash
+# Methode 1: Brew Services (EMPFOHLEN)
+killall -9 sketchybar lua 2>/dev/null
+sleep 2
+brew services restart sketchybar
+
+# Methode 2: Manuell
+pkill -9 sketchybar
+pkill -9 -f "lua.*sketchybar"
+rm -f /tmp/sketchybar_$USER.lock
+sleep 3
+sketchybar
+```
+
+**📖 Details:** [docs/TROUBLESHOOTING.md - Lock-File-Problem](docs/TROUBLESHOOTING.md#-critical-sketchybar-lock-file-problem)
+
+---
+
+#### ⚠️ Workspaces nicht klickbar / nicht highlighted
+**Symptom:** Keine Reaktion auf Klick, keine Hervorhebung beim Wechsel
+
+**Quick Fix:**
+```bash
+brew services restart sketchybar
+sleep 3
+sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=A
+```
+
+**📖 Details:** [docs/TROUBLESHOOTING.md - Workspace-Probleme](docs/TROUBLESHOOTING.md#️-workspace-probleme)
+
+---
+
+#### ⚠️ Front_app (Programm-Name) links statt rechts
+**Symptom:** "Code", "Finder" etc. erscheint links statt rechts nach G
+
+**Quick Fix:**
+```bash
+# 1. Prüfe ob front_app.lua existiert (darf NICHT!)
+mv ~/.config/sketchybar/items/front_app.lua \
+   ~/.config/sketchybar/items/front_app.lua.disabled
+
+# 2. Kompletter Restart (NICHT aerospace reload-config!)
+brew services restart sketchybar
+```
+
+**📖 Details:** [docs/TROUBLESHOOTING.md - Front_app Position](docs/TROUBLESHOOTING.md#problem-front_app-programm-name-links-statt-rechts-nach-g)
+
+---
+
+#### 🐌 Performance-Probleme / Zombie-Prozesse
+**Symptom:** Langsame Reaktion, viele Prozesse laufen
+
+**Quick Fix:**
+```bash
+# Kill Zombie-Prozesse
+pkill -9 -f "aerospace list-"
+pkill -9 -f "sketchybar --query"
+
+# Prüfe Prozess-Count
+ps aux | grep -E '[s]ketchybar' | wc -l
+# Erwartung: 2 (1x sketchybar, 1x lua)
+```
+
+**📖 Details:** [docs/TROUBLESHOOTING.md - Performance](docs/TROUBLESHOOTING.md#-performance-probleme)
+
+---
+
+### Weitere häufige Probleme
 
 **Shortcuts funktionieren nicht:**
 ```bash
@@ -227,12 +304,7 @@ aerospace+sketchy/
 # System Settings → Privacy & Security → Accessibility
 ```
 
-**Sketchybar zeigt keine Workspaces:**
-```bash
-# Event-Integration prüfen
-sketchybar --query bar
-sketchybar --reload
-```
+**📖 Vollständige Diagnostics & Notfall-Reset:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 ## Lizenz
 

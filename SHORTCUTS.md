@@ -351,6 +351,32 @@ Z - Monitor 3+ Overflow
 
 ---
 
+## 🆘 TROUBLESHOOTING
+
+### Lock-File-Probleme / Sketchybar startet nicht
+
+**Symptom:** Workspaces nicht sichtbar, nicht klickbar, oder `could not acquire lock-file... already running?`
+
+**Quick Fix:**
+```bash
+# Force-Clean Restart
+killall -9 sketchybar lua 2>/dev/null
+sleep 2
+brew services restart sketchybar
+```
+
+**📖 Vollständige Dokumentation:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+**Häufige Probleme:**
+- 🔴 Lock-File-Konflikt (mehrere Lua-Prozesse)
+- ⚠️ Workspaces nicht klickbar / highlighted
+- ⚠️ Front_app Position falsch (links statt rechts)
+- 🐌 Performance-Probleme / Zombie-Prozesse
+
+**Alle Lösungen & Diagnostics:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
+
+---
+
 **Status-Legende:**
 - ✅ GLEICH - Identisch zu Yabai
 - ✅ NEU - Neue Funktion in Aerospace
