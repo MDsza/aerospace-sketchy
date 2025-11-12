@@ -22,11 +22,14 @@ enable-normalization-opposite-orientation-for-nested-containers = true
 accordion-padding = 30
 
 # ============================================================================
-# SKETCHYBAR INTEGRATION
+# SKETCHYBAR & BORDERS INTEGRATION
 # ============================================================================
 
-# Start Sketchybar after Aerospace
-after-startup-command = ['exec-and-forget sketchybar']
+# Start Sketchybar and JankyBorders after Aerospace
+after-startup-command = [
+    'exec-and-forget sketchybar',
+    'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/start-borders.sh'
+]
 
 # Trigger Sketchybar on workspace change
 exec-on-workspace-change = [
@@ -179,6 +182,15 @@ ctrl-alt-shift-cmd-p = 'move-workspace-to-monitor --wrap-around next'  # Hyper+ 
 # SYSTEM / SERVICES
 # ----------------------------------------------------------------------------
 ctrl-alt-shift-backslash = 'reload-config'                  # Hyper + \
+
+# ----------------------------------------------------------------------------
+# WORKSPACE CREATION & DELETION (Dynamic Workspaces)
+# ----------------------------------------------------------------------------
+# Hyper + N → Move window to new workspace (finds next available number)
+ctrl-alt-shift-n = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-new-workspace.sh'
+
+# Hyper + Z → Delete current workspace (closes all windows + hides empty workspaces)
+ctrl-alt-shift-z = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/delete-current-workspace.sh'
 
 # ----------------------------------------------------------------------------
 # WINDOW SIZING (Hyper+ + M = Small in corner)

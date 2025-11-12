@@ -28,10 +28,15 @@ if [ "$COUNT" -eq 2 ]; then
     "$RESTART_SCRIPT"
   else
     echo "FEHLER: Neustart-Skript nicht ausführbar: $RESTART_SCRIPT" >>/tmp/sketchybar_apple_handler.log
-    # Fallback: Direkt neustarten (Aerospace)
-    killall AeroSpace 2>/dev/null && sleep 1 && open -a AeroSpace
+    # Fallback: KOMPLETTER Neustart (Force Kill + Lock File Remove)
+    pkill -9 AeroSpace 2>/dev/null
+    pkill -9 sketchybar 2>/dev/null
+    pkill -9 -f "lua /Users/wolfgang/.config/sketchybar" 2>/dev/null
+    rm -f /tmp/sketchybar_$USER.lock 2>/dev/null
+    sleep 2
+    open -a AeroSpace
     sleep 1
-    killall sketchybar 2>/dev/null && sleep 1 && sketchybar
+    sketchybar
   fi
   
   # Setze Zählung zurück

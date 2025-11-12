@@ -1,6 +1,7 @@
 # SHORTCUTS TRANSITION GUIDE
 
 Yabai+SKHD → Aerospace Migration
+**Production Version 1.0** (Phase 3 Complete)
 
 **Modifier-Keys bleiben GLEICH:**
 - **Hyper** = ⌃⌥⇧ (CapsLock via Karabiner)
@@ -23,159 +24,139 @@ Yabai+SKHD → Aerospace Migration
 | Fenster Oben tauschen | Hyper+ + ↑ | Hyper+ + ↑ | ✅ GLEICH |
 | Fenster Unten tauschen | Hyper+ + ↓ | Hyper+ + ↓ | ✅ GLEICH |
 
+**✅ Mouse-Follows-Focus:**
+- Alle Focus-Commands zentrieren Maus automatisch auf neuem Fenster
+- Script: `focus-and-center.sh`
+
 ### Toggle-Modi
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
 | Fullscreen | Hyper + Return | Hyper + Return | ✅ GLEICH |
 | Float Toggle | Hyper+ + Return | Hyper+ + Return | ✅ GLEICH |
-| Layout Toggle | Hyper + K | Hyper + K | ⚠️ GEÄNDERT |
-| Smart Balance | Hyper+ + K | Hyper+ + K | 🔄 ANGEPASST |
-| Rotation 270° | Hyper + . | Hyper + . | ✅ GLEICH |
-| Rotation 90° | Hyper + , | Hyper + , | ✅ GLEICH |
-| Window Shadows | Hyper+ + S | ❌ N/A | ❌ ENTFÄLLT |
+| Layout Toggle | Hyper + K | **Hyper + K** | ⚠️ GEÄNDERT |
+| Balance | Hyper+ + O | **Hyper+ + B** | ⚠️ GEÄNDERT |
+| Rotation Horizontal | Hyper + . | Hyper + . | ✅ GLEICH |
+| Rotation Vertical | Hyper + , | Hyper + , | ✅ GLEICH |
 
-**⚠️ Layout Toggle Änderung:**
-- **Yabai:** BSP ↔ Stack (+ Unfloat-Recovery)
-- **Aerospace:** tiles ↔ accordion ↔ floating
+**⚠️ Hyper+K - Layout Toggle:**
+- **Yabai:** BSP ↔ Stack
+- **Aerospace:** tiles ↔ accordion
+  - **tiles:** Fenster nebeneinander (BSP-ähnlich)
+  - **accordion:** Fenster übereinander (Stack-ähnlich)
 
-**🔄 Smart Balance:**
-- **Yabai:** Grid-Layouts je nach Fensteranzahl
-- **Aerospace:** Automatisches Balance bei tiles-Layout
+**⚠️ Hyper++B - Balance verschoben:**
+- War Hyper++O, jetzt Hyper++B
+- Grund: Hyper+O nun für Workspace-to-Monitor
 
 ---
 
-## WORKSPACE-MANAGEMENT
+## WORKSPACE-MANAGEMENT (QWERTZ-LAYOUT)
 
-### Navigation
+### Navigation - QWERTZ Fixed Layout
+
+**10 feste Workspaces basierend auf Tastatur (linke Hand):**
+
+```
+Row 1:  Q    W    E    R    T
+Row 2:  A    S    D    F    G
+```
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
+| Workspace Q (Queries) | ❌ N/A | **Hyper + Q** | ✅ NEU |
+| Workspace W (Work) | ❌ N/A | **Hyper + W** | ✅ NEU |
+| Workspace E (Email) | ❌ N/A | **Hyper + E** | ✅ NEU |
+| Workspace R | ❌ N/A | **Hyper + R** | ✅ NEU |
+| Workspace T | ❌ N/A | **Hyper + T** | ✅ NEU |
+| Workspace A (AI) | ❌ N/A | **Hyper + A** | ✅ NEU |
+| Workspace S (Search) | ❌ N/A | **Hyper + S** | ✅ NEU |
+| Workspace D (Do) | ❌ N/A | **Hyper + D** | ✅ NEU |
+| Workspace F (Files) | ❌ N/A | **Hyper + F** | ✅ NEU |
+| Workspace G | ❌ N/A | **Hyper + G** | ✅ NEU |
 | Workspace Previous | Hyper + J | Hyper + J | ✅ GLEICH |
 | Workspace Next | Hyper + L | Hyper + L | ✅ GLEICH |
-| Workspace 1 | Hyper + 1 | Hyper + 1 | ✅ GLEICH |
-| Workspace 2 | Hyper + 2 | Hyper + 2 | ✅ GLEICH |
-| Workspace 3-9 | Hyper + [3-9] | Hyper + [3-9] | ✅ GLEICH |
-| Workspace 10 | Hyper + 0 | ❌ N/A | ⚠️ ENTFÄLLT |
-| **Workspace Code** | ❌ N/A | **Hyper + C** | ✅ NEU |
-| **Workspace Music** | ❌ N/A | **Hyper + M** | ✅ NEU |
-| **Workspace Browser** | ❌ N/A | **Hyper + B** | ✅ NEU |
-| **Workspace Email** | ❌ N/A | **Hyper + E** | ✅ NEU |
-| **Workspace Terminal** | ❌ N/A | **Hyper + T** | ✅ NEU |
 
-**⚠️ Workspace 10 entfällt:** Ersetzt durch Buchstaben-Workspaces
+**🔄 Overflow Workspaces (Multi-Monitor):**
 
-### Fenster verschieben
+| Workspace | Verwendung |
+|-----------|------------|
+| **X** | Overflow Monitor 1 (Fenster ohne feste Zuordnung) |
+| **Y** | Overflow Monitor 2 |
+| **Z** | Overflow Monitor 3+ |
 
-| Funktion | Yabai+SKHD | Aerospace | Status |
-|----------|------------|-----------|--------|
-| Zu vorherigem Workspace | Hyper+ + J | Hyper+ + J | ✅ GLEICH |
-| Zu nächstem Workspace | Hyper+ + L | Hyper+ + L | ✅ GLEICH |
-| Zu Workspace 1 | Hyper+ + 1 | Hyper+ + 1 | ✅ GLEICH |
-| Zu Workspace 2 | Hyper+ + 2 | Hyper+ + 2 | ✅ GLEICH |
-| Zu Workspace 3-9 | Hyper+ + [3-9] | Hyper+ + [3-9] | ✅ GLEICH |
-| Zu Workspace 10 | Hyper+ + 0 | ❌ N/A | ⚠️ ENTFÄLLT |
-| **Zu Workspace Code** | ❌ N/A | **Hyper+ + C** | ✅ NEU |
-| **Zu Workspace Music** | ❌ N/A | **Hyper+ + M** | ✅ NEU |
-| **Zu Workspace Browser** | ❌ N/A | **Hyper+ + B** | ✅ NEU |
-| **Zu Workspace Email** | ❌ N/A | **Hyper+ + E** | ✅ NEU |
-| **Zu Workspace Terminal** | ❌ N/A | **Hyper+ + T** | ✅ NEU |
+**Automatisch erstellt bei Smart Window Move (Hyper+I)**
 
-### Workspace-Operationen
+### Fenster verschieben (QWERTZ-Layout)
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
-| Neuer Workspace | Hyper + N | ✅ Automatisch | 🔄 AUTO |
-| Workspace löschen | Hyper + Z | ✅ Automatisch | 🔄 AUTO |
-| Leere Workspaces löschen | Hyper+ + Z | ✅ Automatisch | 🔄 AUTO |
-| Space Explosion | Hyper + D | ❌ N/A | ❌ ENTFÄLLT |
-| Space Implosion | Hyper+ + D | ❌ N/A | ❌ ENTFÄLLT |
-| Mission Control | Hyper + Space | ⚠️ Angepasst | ⚠️ GEÄNDERT |
+| Zu Workspace Q | ❌ N/A | **Hyper+ + Q** | ✅ NEU |
+| Zu Workspace W | ❌ N/A | **Hyper+ + W** | ✅ NEU |
+| Zu Workspace E | ❌ N/A | **Hyper+ + E** | ✅ NEU |
+| Zu Workspace R | ❌ N/A | **Hyper+ + R** | ✅ NEU |
+| Zu Workspace T | ❌ N/A | **Hyper+ + T** | ✅ NEU |
+| Zu Workspace A | ❌ N/A | **Hyper+ + A** | ✅ NEU |
+| Zu Workspace S | ❌ N/A | **Hyper+ + S** | ✅ NEU |
+| Zu Workspace D | ❌ N/A | **Hyper+ + D** | ✅ NEU |
+| Zu Workspace F | ❌ N/A | **Hyper+ + F** | ✅ NEU |
+| Zu Workspace G | ❌ N/A | **Hyper+ + G** | ✅ NEU |
+| Zu Prev Workspace | Hyper+ + J | Hyper+ + J | ✅ GLEICH |
+| Zu Next Workspace | Hyper+ + L | Hyper+ + L | ✅ GLEICH |
 
-**🔄 Workspace-Lifecycle:**
-- **Yabai:** Manuelles Erstellen/Löschen nötig
-- **Aerospace:** Automatisches Erstellen bei move-to-non-existing, Auto-Cleanup bei leer
+**✅ Focus-Follow:**
+- Alle move-and-follow Scripts folgen Fenster automatisch
+- Wie Yabai-Verhalten
 
-**❌ Space Explosion/Implosion:**
-- Unterschiedliche Layout-Logik in Aerospace
-- Alternative: Layouts per Shortcut wechseln (tiles/accordion)
+### Workspace-Zuordnungen (App-Based Auto-Assignment)
 
-**⚠️ Mission Control:**
-- Yabai nutzte nativen Mission Control
-- Aerospace hat eigenes Workspace-Overview (falls implementiert)
+| Workspace | Mnemonic | Apps |
+|-----------|----------|------|
+| **Q** | **Q**ueries | Obsidian |
+| **W** | **W**ork | Citrix, WATTs Up |
+| **E** | **E**mail | Outlook, Mail |
+| **R** | Reserved | - |
+| **T** | - | - |
+| **A** | **A**I | VS Code, Claude, ChatGPT, Cursor, Jupyter |
+| **S** | **S**earch | Safari, Chrome, Firefox, Brave, Arc |
+| **D** | **D**o | Things, OmniFocus, Todoist |
+| **F** | **F**iles | Finder, Forklift, PathFinder |
+| **G** | - | - |
+
+**Auto-Assignment via .aerospace.toml:**
+- Fenster werden automatisch zugeordnet bei window-detected
+- Workspace-Icons in Sketchybar zeigen zugeordnete Apps
 
 ---
 
 ## MULTI-MONITOR MANAGEMENT
 
-**Konzept-Unterschied:**
-- **Yabai:** Jeder Monitor hat eigene Spaces (Mission Control) - z.B. Monitor 1: Space 1-10, Monitor 2: Space 11-20
-- **Aerospace:** Virtuelle Workspaces können zwischen Monitoren wandern (Option 2: Dynamisch)
-
 ### Monitor-Operationen
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
-| Window → Nächster Monitor | Hyper + I | Hyper + I | ✅ GLEICH |
+| **Window → Monitor (Smart)** | Hyper + I | **Hyper + I** | ✅ VERBESSERT |
+| **Workspace → Monitor** | Hyper + O | **Hyper + O** | ⚠️ GEÄNDERT |
 | Focus → Previous Monitor | ❌ N/A | **Hyper + U** | ✅ NEU |
 | Focus → Next Monitor | ❌ N/A | **Hyper + P** | ✅ NEU |
-| Workspace → Previous Monitor | ❌ N/A | **Hyper+ + U** | ✅ NEU |
+| Workspace → Prev Monitor | ❌ N/A | **Hyper+ + U** | ✅ NEU |
 | Workspace → Next Monitor | ❌ N/A | **Hyper+ + P** | ✅ NEU |
 
-**✅ NEU in Aerospace:**
-- **Hyper + U/P:** Monitor-Fokus wechseln (ohne Fenster zu bewegen)
-- **Hyper+ + U/P:** Workspace zwischen Monitoren verschieben (KEY für dynamisches Multi-Monitor!)
+**✅ VERBESSERT: Hyper+I - Smart Window-to-Monitor Move**
 
-**⚠️ WICHTIG:**
-- Hyper+J/L wechselt Workspaces auf AKTUELLEM Monitor
-- Workspace "erscheint" wo du gerade fokussiert bist
-- Mit Hyper+ +U/P kannst du Workspace auf anderen Monitor verschieben
+Intelligente Workspace-Erstellung verhindert numerische Workspaces:
 
-**Beispiel-Workflow:**
-1. `Hyper + E` → Workspace E erscheint auf aktuellem Monitor
-2. `Hyper+ + P` → Workspace E wandert zu anderem Monitor
-3. `Hyper + U` → Fokus zum anderen Monitor wechseln
-4. `Hyper + J/L` → Workspace wechseln auf aktuellem Monitor
+1. **Ziel-Monitor hat Workspaces:** Normales Move
+2. **Ziel-Monitor leer:**
+   - **App hat Zuordnung:** Erstellt zugeordneten Workspace (z.B. VS Code → A)
+   - **App ohne Zuordnung:** Erstellt Overflow-Workspace X/Y/Z
 
-### Sketchybar Monitor-Awareness ✅
+**Script:** `move-window-to-monitor.sh`
 
-**Workspace-Gruppierung nach Monitor:**
-
-Sketchybar zeigt Workspaces gruppiert nach Monitor-Zuordnung an:
-
-```
-Built-in Monitor    │    External Monitor
- [E] [T] [C] [B] [M] │ [1] [2] [3] [4] [5] [6] [7] [8] [9]
-```
-
-**Fixed Order Approach:**
-- **Letter Workspaces (E,T,C,B,M):** Built-in Retina Display
-- **Separator (│):** Visuelle Trennung
-- **Numeric Workspaces (1-9):** External Monitor (HP 738pu)
-
-**Vorteile:**
-- Sofort erkennbar, welche Workspaces zu welchem Monitor gehören
-- Separator macht Gruppierung visuell klar
-- Letter = Internal, Numbers = External (semantische Zuordnung)
-
-**Hinweis:**
-- Dies ist eine FIXED order basierend auf deinem typischen Setup
-- Wenn Workspaces zwischen Monitoren wandern (Hyper+ +U/P), bleibt die Sketchybar-Ordnung konstant
-- Pragmatischer Approach: Letter-Workspaces bleiben konzeptuell Internal (E=Email, T=Terminal, etc.)
-
----
-
-### Workspace-Modi
-
-| Funktion | Yabai+SKHD | Aerospace | Status |
-|----------|------------|-----------|--------|
-| Fenster → Neuer Workspace + Max | Hyper + M | ⚠️ Angepasst | ⚠️ GEÄNDERT |
-| Andere Fenster minimize/restore | Hyper+ + P | 🔄 Angepasst | 🔄 ANGEPASST |
-| Fenster klein in Ecke | Hyper+ + M | Hyper+ + M | ✅ GLEICH |
-
-**⚠️ Hyper + M Änderung:**
-- Aerospace erstellt Workspace automatisch bei move-to-non-existing
-- Maximieren via `fullscreen` command
+**⚠️ GEÄNDERT: Hyper+O - Workspace-to-Monitor**
+- **Vorher:** Hyper++U (Primärfunktion nun Hyper+O)
+- **Jetzt:** Verschiebt gesamten Workspace auf anderen Monitor
+- **Hauptfunktion für dynamisches Multi-Monitor-Setup!**
 
 ---
 
@@ -183,16 +164,40 @@ Built-in Monitor    │    External Monitor
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
-| YabaiIndicator restart | Hyper + \ | ❌ N/A | ❌ ENTFÄLLT |
-| Fix Space Associations | Hyper+ + F | ❌ N/A | ❌ ENTFÄLLT |
-| Aerospace reload config | ❌ N/A | Hyper + \ | ✅ NEU |
+| Config neu laden | Hyper + \ | Hyper + \ | ✅ GLEICH |
+| Doppelklick Apple-Logo | ❌ N/A | **Kompletter Reload** | ✅ NEU |
+| Workspace erstellen | Hyper + N | ❌ Deaktiviert | ❌ ENTFÄLLT |
+| Workspace löschen | Hyper + Z | ❌ Deaktiviert | ❌ ENTFÄLLT |
 
-**✅ NEU: Hyper + \**
-- Lädt Aerospace-Config neu
-- Command: `aerospace reload-config`
+**✅ NEU: Apple-Logo Doppelklick**
+- Kompletter Reload: Aerospace + Sketchybar
+- Force-Kill + Lock-File-Remove
+- Korrigiert Front-App-Position
 
-**❌ Fix Space Associations:**
-- Nicht nötig (virtuelle Workspaces ohne Display-Abhängigkeit)
+**❌ Hyper+N/Z deaktiviert:**
+- Nicht mehr nötig mit Fixed QWERTZ-Layout (Q-G) + Overflow (X-Z)
+- Workspaces sind immutable names
+
+---
+
+## GAPS & BORDERS (JankyBorders Integration)
+
+**Neu konfiguriert:**
+
+```toml
+[gaps]
+inner.horizontal = 5
+inner.vertical = 5
+outer.left = 5
+outer.right = 5
+outer.top = 5
+outer.bottom = 35  # Sketchybar (30) + Border (5)
+```
+
+**Resultat:**
+- 5px Abstand zwischen Fenstern
+- 5px Abstand zu Bildschirmrändern
+- JankyBorders-Rahmen vollständig sichtbar (nicht abgeschnitten)
 
 ---
 
@@ -200,171 +205,31 @@ Built-in Monitor    │    External Monitor
 
 ### Was bleibt GLEICH ✅
 - **Alle Focus/Swap-Shortcuts** (Hyper + Pfeile)
-- **Workspace 1-9 Navigation** (Hyper + [1-9])
-- **Fenster zu Workspace** (Hyper+ + [1-9])
-- **Display Movement** (Hyper + I/O)
+- **Workspace Prev/Next** (Hyper + J/L)
+- **Fenster zu Workspace** (Hyper+ + J/L)
 - **Fullscreen/Float** (Hyper + Return, Hyper+ + Return)
+- **Rotation** (Hyper + , / .)
 
 ### Was ist NEU ✅
-- **Buchstaben-Workspaces** (C, M, B, E, T)
-- **Hybrid-Navigation:** Zahlen + Buchstaben gemischt
-- **Auto-Workspace-Lifecycle:** Kein manuelles Erstellen/Löschen
+- **QWERTZ-Workspaces** (Q W E R T / A S D F G)
+- **Overflow-Workspaces** (X Y Z für Multi-Monitor)
+- **Smart Window-to-Monitor** (Hyper+I mit App-Assignment)
+- **Workspace-to-Monitor** (Hyper+O - Hauptfunktion!)
+- **Layout Toggle tiles↔accordion** (Hyper+K)
+- **Monitor-Fokus** (Hyper+U/P)
+- **Apple-Logo Doppelklick** (Kompletter Reload)
 
 ### Was ENTFÄLLT ❌
-- **Workspace 10** (Hyper + 0)
-- **Space Explosion/Implosion** (Hyper + D/D+)
-- **Window Shadows** (Hyper+ + S)
-- **Fix Space Associations** (Hyper+ + F)
-- **YabaiIndicator restart** (Hyper + \)
+- **Numerische Workspaces 1-10** (Ersetzt durch QWERTZ)
+- **Hyper+N** (Workspace erstellen - nicht mehr nötig)
+- **Hyper+Z** (Workspace löschen - nicht mehr nötig)
+- **Space Explosion/Implosion** (Andere Layout-Logik)
+- **Window Shadows** (Nicht in Aerospace)
 
 ### Was sich ÄNDERT ⚠️
-- **Layout Toggle** (Hyper + K): BSP/Stack → tiles/accordion/floating
-- **Mission Control** (Hyper + Space): Aerospace-eigenes System
-- **Workspace-Lifecycle:** Automatisch statt manuell
-
----
-
-## AEROSPACE-CONFIG REFERENZ
-
-### Workspace-Navigation
-
-```toml
-[mode.main.binding]
-# Direct Workspace Switch
-ctrl-alt-shift-1 = 'workspace 1'
-ctrl-alt-shift-2 = 'workspace 2'
-ctrl-alt-shift-3 = 'workspace 3'
-ctrl-alt-shift-4 = 'workspace 4'
-ctrl-alt-shift-5 = 'workspace 5'
-ctrl-alt-shift-6 = 'workspace 6'
-ctrl-alt-shift-7 = 'workspace 7'
-ctrl-alt-shift-8 = 'workspace 8'
-ctrl-alt-shift-9 = 'workspace 9'
-ctrl-alt-shift-c = 'workspace C'
-ctrl-alt-shift-m = 'workspace M'
-ctrl-alt-shift-b = 'workspace B'
-ctrl-alt-shift-e = 'workspace E'
-ctrl-alt-shift-t = 'workspace T'
-
-# Circular Navigation
-ctrl-alt-shift-j = 'workspace --wrap-around prev'
-ctrl-alt-shift-l = 'workspace --wrap-around next'
-```
-
-### Window Movement
-
-```toml
-# Focus
-ctrl-alt-shift-left = 'focus left'
-ctrl-alt-shift-right = 'focus right'
-ctrl-alt-shift-up = 'focus up'
-ctrl-alt-shift-down = 'focus down'
-
-# Swap
-ctrl-alt-shift-cmd-left = 'move left'
-ctrl-alt-shift-cmd-right = 'move right'
-ctrl-alt-shift-cmd-up = 'move up'
-ctrl-alt-shift-cmd-down = 'move down'
-
-# Move to Workspace
-ctrl-alt-shift-cmd-1 = 'move-node-to-workspace 1'
-ctrl-alt-shift-cmd-2 = 'move-node-to-workspace 2'
-# ... etc
-ctrl-alt-shift-cmd-c = 'move-node-to-workspace C'
-ctrl-alt-shift-cmd-m = 'move-node-to-workspace M'
-# ... etc
-
-# Circular Move
-ctrl-alt-shift-cmd-j = 'move-node-to-workspace --wrap-around prev'
-ctrl-alt-shift-cmd-l = 'move-node-to-workspace --wrap-around next'
-```
-
-### Layouts
-
-```toml
-# Layout Toggle
-ctrl-alt-shift-k = 'layout tiles horizontal vertical'
-
-# Fullscreen
-ctrl-alt-shift-return = 'fullscreen'
-
-# Float
-ctrl-alt-shift-cmd-return = 'layout floating tiling'
-
-# Rotation
-ctrl-alt-shift-0x2F = 'layout tiles horizontal vertical'  # Period (.)
-ctrl-alt-shift-0x2B = 'layout tiles vertical horizontal'  # Comma (,)
-```
-
-### Display Management
-
-```toml
-# Move to next Monitor
-ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'
-```
-
-### System
-
-```toml
-# Reload Config
-ctrl-alt-shift-0x2A = 'reload-config'  # Backslash (\)
-```
-
----
-
-## TIPPS FÜR DEN ÜBERGANG
-
-### Woche 1: Basis-Navigation
-- **Fokus:** Workspace 1-9 + Focus/Swap
-- **Muscle Memory:** Identisch zu Yabai
-- **Neue Shortcuts ignorieren:** Noch nicht C/M/B/E/T nutzen
-
-### Woche 2: Buchstaben-Workspaces
-- **Fokus:** C/M/B/E/T erkunden
-- **Use Case festlegen:**
-  - C = VS Code, Terminal, IDEs
-  - M = Spotify, iTunes
-  - B = Browser-Windows
-  - E = Mail.app
-  - T = Dedizierte Shell-Sessions
-- **Muscle Memory aufbauen:** Bewusst Buchstaben-Shortcuts nutzen
-
-### Woche 3: Layout-System
-- **Fokus:** tiles/accordion/floating verstehen
-- **Unterschied zu Yabai:**
-  - tiles = BSP-ähnlich
-  - accordion = Stack-ähnlich (alle Fenster übereinander)
-  - floating = wie Yabai float
-- **Experimentieren:** Hyper + K mehrfach drücken
-
-### Woche 4: Workflows optimieren
-- **Fokus:** App-Zuordnungen verfeinern
-- **Auto-Assignment nutzen:** Apps automatisch zu Workspaces
-- **Scripts anpassen:** Eigene Workflows portieren
-
----
-
-## HÄUFIGE FEHLER
-
-### ❌ Workspace 10 nicht verfügbar
-**Problem:** Hyper + 0 funktioniert nicht mehr
-**Lösung:** Workspace 10 durch Buchstaben-Workspace ersetzen
-
-### ❌ Space Explosion fehlt
-**Problem:** Hyper + D macht nichts
-**Lösung:** Aerospace hat andere Layout-Logik, Layouts per Shortcut wechseln
-
-### ❌ Mission Control zeigt keine Workspaces
-**Problem:** Aerospace-Workspaces sind virtuell
-**Lösung:** Gewöhnung, Cmd+Tab funktioniert weiter für Apps
-
-### ❌ Layout Toggle verhält sich anders
-**Problem:** Hyper + K macht nicht BSP ↔ Stack
-**Lösung:** Mehrfach drücken für tiles → accordion → floating
-
-### ❌ Fenster "verschwinden"
-**Problem:** Minimierte Fenster nicht im Dock
-**Lösung:** Aerospace versteckt Fenster, nutze Workspace-Navigation
+- **Balance:** Hyper++O → **Hyper++B**
+- **Workspace-to-Monitor:** Hyper++U → **Hyper+O**
+- **Layout Toggle:** BSP/Stack → **tiles/accordion**
 
 ---
 
@@ -372,52 +237,130 @@ ctrl-alt-shift-0x2A = 'reload-config'  # Backslash (\)
 
 ### FOCUS & SWAP
 ```
-Hyper + ← ↑ → ↓     Focus (NESW)
-Hyper+ + ← ↑ → ↓    Swap (NESW)
+Hyper + ← ↑ → ↓     Focus + Mouse Center
+Hyper+ + ← ↑ → ↓    Swap Windows
 ```
 
-### WORKSPACES
+### WORKSPACES (QWERTZ-LAYOUT)
 ```
-Hyper + [1-9]       Workspace 1-9
-Hyper + C/M/B/E/T   Code/Music/Browser/Email/Terminal
-Hyper + J/L         Prev/Next Workspace
+Hyper + Q W E R T   Row 1 Workspaces
+Hyper + A S D F G   Row 2 Workspaces
+Hyper + J / L       Prev / Next Workspace
 ```
 
-### MOVE WINDOWS
+### MOVE WINDOWS (QWERTZ-LAYOUT)
 ```
-Hyper+ + [1-9]      Zu Workspace 1-9
-Hyper+ + C/M/B/E/T  Zu Code/Music/Browser/Email/Terminal
-Hyper+ + J/L        Zu Prev/Next Workspace
+Hyper+ + Q W E R T  Zu Row 1 Workspaces
+Hyper+ + A S D F G  Zu Row 2 Workspaces
+Hyper+ + J / L      Zu Prev/Next + Follow
 ```
 
 ### LAYOUTS
 ```
 Hyper + Return      Fullscreen
-Hyper+ + Return     Float
-Hyper + K           Layout Toggle (tiles/accordion/float)
-Hyper + . / ,       Rotation 270° / 90°
+Hyper+ + Return     Float Toggle
+Hyper + K           Layout Toggle (tiles ↔ accordion)
+Hyper + . / ,       Rotation Horizontal / Vertical
+Hyper+ + B          Balance Sizes
 ```
 
-### DISPLAY
+### MULTI-MONITOR (★ KEY FEATURES)
 ```
-Hyper + I           Fenster zu nächstem Display
-Hyper + O           Alle Fenster zu nächstem Display
+Hyper + I           Smart Window → Monitor (mit X/Y/Z)
+Hyper + O           Workspace → Monitor (HAUPTFUNKTION!)
+Hyper + U / P       Focus Monitor Prev / Next
+Hyper+ + U / P      Workspace → Monitor Prev / Next
 ```
 
 ### SYSTEM
 ```
-Hyper + \           Aerospace Config neu laden
+Hyper + \           Aerospace Config Reload
+Double-Click 🍎     Kompletter Reload (Aerospace + Sketchybar)
 ```
+
+---
+
+## WORKSPACE-SEMANTIK
+
+### Fixed Workspaces (QWERTZ)
+```
+Q - Queries:  Obsidian
+W - Work:     Citrix, WATTs Up
+E - Email:    Outlook, Mail
+R - Reserved
+T - (offen)
+
+A - AI:       VS Code, Claude, ChatGPT, Cursor, Jupyter
+S - Search:   Safari, Chrome, Firefox, Brave, Arc
+D - Do:       Things, OmniFocus, Todoist
+F - Files:    Finder, Forklift, PathFinder
+G - (offen)
+```
+
+### Overflow Workspaces (Multi-Monitor)
+```
+X - Monitor 1 Overflow (Apps ohne feste Zuordnung)
+Y - Monitor 2 Overflow
+Z - Monitor 3+ Overflow
+```
+
+**Automatisch erstellt bei Hyper+I auf leeren Monitor**
+
+---
+
+## TIPPS FÜR DEN ÜBERGANG
+
+### Tag 1: QWERTZ-Layout lernen
+- **Linke Hand Position:** Q W E R T über A S D F G
+- **Muscle Memory:** Tastatur-basiert statt Zahlen
+- **Start einfach:** Nur Q/E/A/S/D nutzen (häufigste Apps)
+
+### Woche 1: Basis-Workflows
+- Workspace-Navigation mit Hyper+Q/E/A/S/D/F
+- Apps automatisch zuordnen lassen (Auto-Assignment)
+- Hyper+J/L für sequentielle Navigation
+
+### Woche 2: Multi-Monitor optimieren
+- **Hyper+O** meistern (Workspace-to-Monitor)
+- **Hyper+I** mit Smart-Assignment testen
+- Overflow-Workspaces X/Y/Z verstehen
+
+### Woche 3: Layout-System
+- **Hyper+K** für tiles ↔ accordion
+- Unterschied zu Yabai BSP/Stack verstehen
+- Workflows anpassen (tiles für Code, accordion für Fullscreen-Apps)
+
+---
+
+## HÄUFIGE FEHLER & LÖSUNGEN
+
+### ❌ "Workspaces 1-9 fehlen!"
+**Lösung:** QWERTZ-Layout (Q-G) ersetzt numerische Workspaces. Muscle Memory umlernen.
+
+### ❌ "Hyper+N macht nichts!"
+**Lösung:** Deaktiviert. Fixed QWERTZ-Layout benötigt keine dynamischen Workspaces.
+
+### ❌ "Programmname (Code) links von Workspaces!"
+**Lösung:** Doppelklick auf Apple-Logo (🍎) → Kompletter Reload korrigiert Position.
+
+### ❌ "Rahmen (JankyBorders) wird abgeschnitten!"
+**Lösung:** Bereits konfiguriert. Gaps: inner 5px, outer 5px. Aerospace neu starten falls nötig.
+
+### ❌ "Workspace-to-Monitor funktioniert nicht!"
+**Lösung:** **Hyper+O** (nicht mehr Hyper++U). Hauptfunktion für dynamisches Multi-Monitor.
 
 ---
 
 **Status-Legende:**
 - ✅ GLEICH - Identisch zu Yabai
 - ✅ NEU - Neue Funktion in Aerospace
+- ✅ VERBESSERT - Funktion erweitert
 - 🔄 ANGEPASST - Funktion angepasst
-- ⚠️ GEÄNDERT - Verhalten geändert
+- ⚠️ GEÄNDERT - Verhalten/Keybinding geändert
 - ❌ ENTFÄLLT - Nicht verfügbar in Aerospace
 
 ---
 
-*Dieses Cheat Sheet wird aktualisiert wenn neue Shortcuts hinzukommen!*
+**Version:** 1.0 (Phase 3 Complete)
+**Letzte Aktualisierung:** 2025-11-12
+**Migration:** Yabai+SKHD → Aerospace Complete
