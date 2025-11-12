@@ -8,7 +8,7 @@
 - Sketchybar startet nicht: `could not initialize daemon! abort..`
 - Workspaces werden nicht angezeigt/nicht klickbar/nicht highlighted
 - Mehrere Lua-Prozesse laufen gleichzeitig
-- Programme-Name (front_app) erscheint links statt rechts nach G
+- Programme-Name wird nicht aktualisiert (tritt seit Entfernen des Front-App-Items nicht mehr auf)
 
 ### Root Cause
 **Mehrfache Sketchybar-Neustart-Versuche erzeugen Zombie-Prozesse**, die das Lock-File halten:
@@ -59,20 +59,20 @@ sleep 3
 sketchybar --query bar
 ```
 
-### Lösung 3: Apple-Logo Doppelklick (In-App)
+### Lösung 3: Apple-Logo Doppelklick (Soft-Refresh)
 **Im laufenden System:**
 1. Doppelklick auf Apple-Logo in Sketchybar (unten links)
-2. Wartet automatisch und macht Force-Clean + Restart
-3. Script: `~/.config/sketchybar/plugins/restart_services.sh`
+2. Startet `scripts/refresh-aerospace-sketchy.sh` → Symlink-Check, `aerospace reload-config`, `sketchybar --reload`, Events triggern
+3. Kein Force-Kill mehr nötig; der harte Neustart (`scripts/restart_services.sh`) bleibt als Fallback per Terminal
 
 ### Prävention
 **WICHTIG: Nach jeder Sketchybar-Config-Änderung:**
 
 1. **Nur EINE Methode verwenden:**
-   - `brew services restart sketchybar` (EMPFOHLEN)
+   - Apple-Logo Doppelklick (Soft-Refresh, EMPFOHLEN)
+   - ODER `brew services restart sketchybar`
    - ODER `pkill -9 sketchybar && sketchybar`
-   - ODER Apple-Logo Doppelklick
-   - **NIEMALS mehrfach hintereinander restarten!**
+   - **NIEMALS mehrfach hintereinander hart restarten!**
 
 2. **Warte immer 3-5 Sekunden** zwischen Stop und Start:
    ```bash
@@ -83,8 +83,7 @@ sketchybar --query bar
 
 3. **Vermeide `aerospace reload-config`** für Sketchybar-Updates:
    - `aerospace reload-config` triggert Events, aber lädt Sketchybar NICHT neu
-   - Front_app bleibt dann links statt rechts
-   - **Lösung:** Kompletter Sketchybar-Restart nötig (siehe oben)
+   - Nutze stattdessen das Refresh-Script oder `sketchybar --reload`
 
 4. **Prüfe Prozess-Count nach Restart:**
    ```bash
@@ -115,33 +114,6 @@ sketchybar --query space.A | grep "highlight"
 # Erwartung: "highlight": "on"
 ```
 
-### Problem: Front_app (Programm-Name) links statt rechts nach G
-**Symptom:** Nach Sketchybar-Restart erscheint "Code", "Finder" etc. links von Workspaces statt rechts nach G
-
-**Ursache:**
-1. `front_app.lua` existiert noch im `items/` Verzeichnis (darf NICHT existieren!)
-2. Sketchybar wurde nur mit `aerospace reload-config` reloaded (unzureichend!)
-
-**Lösung:**
-```bash
-# 1. Prüfe ob front_app.lua existiert
-ls -la ~/.config/sketchybar/items/front_app.lua
-
-# Wenn JA → umbenennen!
-mv ~/.config/sketchybar/items/front_app.lua \
-   ~/.config/sketchybar/items/front_app.lua.disabled
-
-# 2. Kompletter Sketchybar-Restart (NICHT aerospace reload-config!)
-brew services restart sketchybar
-```
-
-**Warum `aerospace reload-config` nicht reicht:**
-- Triggert Sketchybar-Events
-- Lädt Sketchybar-Items NICHT neu
-- Item-Reihenfolge bleibt falsch (front_app links)
-- **Lösung:** Kompletter Sketchybar-Restart
-
----
 
 ## 🐌 Performance-Probleme
 
@@ -214,11 +186,7 @@ sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=A
 sketchybar --query space.A | grep "highlight"
 # Erwartung: "highlight": "on"
 
-# 6. Prüfe Front-App-Position
-sketchybar --query bar | grep -A1 "space.G" | grep -A5 "front_app"
-# Erwartung: front_app kommt NACH space.G
-
-# 7. Prüfe Zombie-Prozesse
+# 6. Prüfe Zombie-Prozesse
 ps aux | grep -E 'aerospace (list|enable)' | grep -v grep
 # Erwartung: Leer oder nur aktuelle Prozesse (<5 Sekunden alt)
 ```
@@ -251,6 +219,7 @@ sleep 1
 
 echo "=== Starte Services neu ==="
 open -a AeroSpace
+aerospace reload-config
 sleep 2
 brew services start sketchybar
 sleep 3

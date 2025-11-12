@@ -1,8 +1,9 @@
 # MIGRATIONS-PLAN: Yabai → Aerospace + Sketchybar
 
-**Status:** Phase 5 - ABGESCHLOSSEN ✅ | Bereit für Phase 6
-**Letzte Aktualisierung:** 2025-11-11 21:15
+**Status:** Phase 5 - ABGESCHLOSSEN ✅ | Production-ready + App-Icons Instant-Update Fix
+**Letzte Aktualisierung:** 2025-11-12 19:05
 **Aktueller Schritt:** Phase 6 - Deinstallation (Soft)
+**Latest:** App-Icons Update Delay behoben (workspace_force_refresh Handler, 150ms delay, 2s polling)
 
 ---
 
@@ -417,16 +418,21 @@ Fenster müssen "clean" sein (kein WM) wenn neuer WM startet.
 **Dauer:** ~45 Minuten
 **Voraussetzungen:** Phase 2 abgeschlossen, Aerospace läuft
 
-### 3.1 Workspace-Setup (Hybrid)
+### 3.1 Workspace-Setup (QWERTZ Fixlayout)
 
-**Mapping:**
+**Mapping (10 feste Workspaces + Overflow):**
 ```
-1-9  → Standard Workspaces (Zahlen)
-C    →  Code (VS Code, Terminal, IDEs)
-M    →  Music (Spotify, iTunes, Audio)
-B    →  Browser (Safari, Firefox, Chrome)
-E    → ✉ Email (Mail.app, Outlook)
-T    →  Terminal (dediziert Shell-Sessions)
+Q  → Quick Notes / Obsidian / Research
+W  → Work / Citrix
+E  → Email / Messaging
+R  → Meetings / Reserved
+T  → Terminal Shared
+A  → AI / IDEs / VS Code
+S  → Search / Browser
+D  → Do / Productivity
+F  → Files / Finder
+G  → General / Sandbox
+Overflow (X/Y/Z) → Automatisch bei Mehrmonitorbedarf
 ```
 
 ### 3.2 Keyboard Shortcuts konvertieren
@@ -434,10 +440,10 @@ T    →  Terminal (dediziert Shell-Sessions)
 **Alle 40+ SKHD-Shortcuts → Aerospace TOML**
 
 Kategorien:
-- Focus/Swap (Hyper + Pfeile)
-- Layouts (Hyper + K)
-- Workspaces (Hyper + [1-9,C,M,B,E,T])
-- Move Windows (Hyper+ + [1-9,C,M,B,E,T])
+- Focus/Swap (Hyper + Pfeile bzw. Hyper + N/M für Fenster-Sequenz)
+- Layouts (Hyper + H/V/K → Tiles horizontal/vertical, Accordion-Toggle)
+- Workspaces (Hyper + [Q,W,E,R,T,A,S,D,F,G])
+- Move Windows (Hyper+ + [Q,W,E,R,T,A,S,D,F,G])
 - Display Management (Hyper + I/O)
 - Service Management
 
@@ -494,7 +500,7 @@ outer.right = 0
 ### Checkliste Phase 3
 
 - [x] aerospace.toml Production erstellt (260+ Zeilen)
-- [x] Alle Workspaces definiert (1-9, C, M, B, E, T)
+- [x] Alle Workspaces definiert (Q,W,E,R,T,A,S,D,F,G + Overflow X/Y/Z)
 - [x] Alle Shortcuts konvertiert mit Hyper (ctrl-alt-shift)
 - [x] Window Rules portiert (System Settings, Raycast, Karabiner, etc.)
 - [x] App-Assignments vorbereitet (initial disabled)
@@ -514,16 +520,13 @@ outer.right = 0
 1. **Hyper-Shortcuts (CapsLock = Karabiner)**
    - Focus: Hyper + h/j/k/l oder Pfeile
    - Swap: Hyper+ + h/j/k/l oder Pfeile
-   - Workspaces: Hyper + 1-9, C, M, B, E, T
-   - Move to Workspace: Hyper+ + 1-9, C, M, B, E, T
+   - Workspaces: Hyper + Q W E R T A S D F G
+   - Move to Workspace: Hyper+ + Q W E R T A S D F G
 
-2. **Workspace-System (Hybrid)**
-   - 1-9: Standard Workspaces
-   - C: Code (VS Code, IDEs)
-   - M: Music (Spotify)
-   - B: Browser (Safari, Firefox, Chrome)
-   - E: Email (Mail, Outlook)
-   - T: Terminal
+2. **Workspace-System (QWERTZ)**
+   - QWERT: Navigation/Comms
+   - ASDFG: Builder/Productivity
+   - Overflow: X/Y/Z bei Bedarf
 
 3. **Layouts**
    - Fullscreen: Hyper + Enter
@@ -583,8 +586,8 @@ exec-on-workspace-change = [
 
 **Änderungen:**
 - Von Yabai-Queries → Aerospace-Events
-- 20 Spaces → 14 Spaces (1-9, C, M, B, E, T)
-- Icon-Mapping für Buchstaben-Workspaces
+- 20 Spaces → 10 feste QWERTZ-Workspaces + Overflow X/Y/Z
+- Icon-Mapping für jeden Buchstaben (SF Symbols)
 - Highlighting aktiver Workspace
 
 ### 4.3 Event-Handler
@@ -597,8 +600,8 @@ exec-on-workspace-change = [
 
 FOCUSED_WORKSPACE="$FOCUSED_WORKSPACE"
 
-# Alle Spaces auf inactive setzen
-for space in 1 2 3 4 5 6 7 8 9 C M B E T; do
+# Alle QWERTZ/Overflow-Spaces auf inactive setzen
+for space in Q W E R T A S D F G X Y Z; do
   sketchybar --set "space.$space" icon.font.style="Regular" icon.font.size=12
 done
 
@@ -620,16 +623,14 @@ Mappt Aerospace-Events auf alte Yabai-Trigger für Kompatibilität während Test
 
 ```lua
 -- spaces.lua
-local workspace_icons = {
-  ["1"] = "1", ["2"] = "2", ["3"] = "3", ["4"] = "4", ["5"] = "5",
-  ["6"] = "6", ["7"] = "7", ["8"] = "8", ["9"] = "9",
-  ["C"] = "", -- Code
-  ["M"] = "", -- Music
-  ["B"] = "", -- Browser
-  ["E"] = "✉", -- Email
-  ["T"] = ""  -- Terminal
+local workspace_labels = {
+  Q = "Q", W = "W", E = "E", R = "R", T = "T",
+  A = "A", S = "S", D = "D", F = "F", G = "G",
+  X = "X", Y = "Y", Z = "Z"
 }
 ```
+
+**App-Zeile:** Die Label-Spalte jedes Items wird mit Icons der aktiven Apps aus `helpers/app_icons.lua` gefüllt (z. B. Obsidian = Tropfen, Citrix = Koffer). Leere Workspaces zeigen `—`. Somit entspricht die Sketchybar-Leiste exakt dem Screenshot (Buchstabe oben, App-Icons darunter).
 
 ### Checkliste Phase 4
 
@@ -637,7 +638,7 @@ local workspace_icons = {
 - [x] Spaces Widget umgebaut (von "space" zu "item" Type)
 - [x] aerospace_batch.lua Helper erstellt
 - [x] Workspace-Labels definiert (SF Symbols für Kompatibilität)
-- [x] Sketchybar zeigt korrekte Workspaces (1-9, E, T, C, B, M)
+- [x] Sketchybar zeigt korrekte Workspaces (Q,W,E,R,T,A,S,D,F,G, optional X/Y/Z)
 - [x] Highlighting funktioniert (sofort via Aerospace-Trigger)
 - [x] App-Icons werden angezeigt (sofort nach WS-Wechsel)
 - [x] Performance OK (keine Lags, kein 2s-Watcher nötig)
@@ -667,14 +668,12 @@ sbar.add("item", "space.1", { ... })  # Normale Items ohne Space-Binding
 - Alle VOR Aerospace gestarteten Apps blieben "unsichtbar"
 - **Lösung:** Apps aktivieren/fokussieren → Aerospace erkennt sie → übernimmt alle Fenster
 
-**Problem 3: Icons für Letter-Workspaces**
-- Unicode NerdFont Icons (󰨞, , ) funktionierten nicht zuverlässig
+**Problem 3: Icons für Buchstaben-Workspaces**
+- Unicode NerdFont Icons funktionierten nicht zuverlässig
 - **Lösung:** SF Symbols verwenden (native macOS Icons, garantiert kompatibel)
   - E = 􀍕 (envelope.fill)
   - T = 􀩼 (app.terminal.fill)
-  - C = 􀤙 (chevron.left.forwardslash.chevron.right)
-  - B = 􀎬 (safari.fill)
-  - M = 􀑪 (play.fill)
+  - Q/W/A/S/... passende SF-Symbole je nach Kategorie
 
 **Problem 4: Periodic Watcher unnötig**
 - **Ursprünglich:** 2s-Watcher zum Polling des aktuellen Workspace
@@ -688,21 +687,21 @@ sbar.add("item", "space.1", { ... })  # Normale Items ohne Space-Binding
 - **Lösung:** Karabiner manuell starten, Login Items aktivieren
 
 **Problem 6: Apple-Icon Doppelklick startete noch Yabai**
-- **Root Cause:** Scripts noch mit `yabai --restart-service` codiert
+- **Root Cause:** Altes Skript killte Prozesse hart statt Config nur neu zu laden
 - **Lösung:**
-  - `restart_services.sh` auf Aerospace umgestellt
-  - `apple_click_handler.sh` Fallback gefixt
-  - Beide Scripts starten jetzt: `killall AeroSpace && open -a AeroSpace`
+  - Neuer Refresh-Flow (`scripts/refresh-aerospace-sketchy.sh`) lädt Aerospace- und Sketchybar-Config sanft neu
+  - Apple-Handler ruft jetzt ausschließlich das Refresh-Script auf
+  - Hard-Restart (`restart_services.sh`) bleibt als Fallback erhalten
 
 ### Ergebnis Phase 4
 
 **Funktioniert:**
-- ✅ 14 Workspaces korrekt angezeigt (1-9, E, T, C, B, M)
+- ✅ 10 QWERTZ-Workspaces + Overflow korrekt angezeigt
 - ✅ Workspace-Wechsel via Hyper-Shortcuts sofort
 - ✅ Active Workspace Highlighting sofort (fett)
 - ✅ App-Icons sofort nach Workspace-Wechsel
 - ✅ Click-to-Switch funktioniert
-- ✅ Doppelklick Apple-Icon → Aerospace Neustart
+- ✅ Doppelklick Apple-Icon → Sanfter Refresh (kein Prozess-Kill)
 - ✅ Alle Fenster von Aerospace verwaltet (17 Fenster)
 
 **Dateien erstellt/angepasst:**
@@ -736,39 +735,33 @@ configs/sketchybar/
    - Query windows mit workspace+monitor Info
 
 2. **spaces.lua Fixed Order Approach:**
-   - **Built-in Monitor Workspaces:** E, T, C, B, M
-   - **Separator:** │ (vertikaler Bar)
-   - **External Monitor Workspaces:** 1-9
-
-   ```lua
-   local workspaces = {"E", "T", "C", "B", "M", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
-   -- Separator wird nach "M" eingefügt
-   ```
+   - **Main Order:** Q W E R T | A S D F G
+   - **Overflow:** X Y Z (nur sichtbar wenn vorhanden)
+   - **Separator:** │ trennt obere/untere Reihe
 
 3. **Pragmatische Entscheidung:**
    - KEINE dynamische Reorganisation bei Workspace-Movement zwischen Monitoren
-   - FIXED order basierend auf typischem Setup
-   - Letter-Workspaces = Konzeptuell Internal (E=Email, T=Terminal, etc.)
-   - Numeric Workspaces = Konzeptuell External (Haupt-Arbeitsbereich)
+   - FIXE Reihenfolge entlang der Tastatur (Muscle Memory)
+   - Overflow-Workspaces erscheinen am Ende, sobald Aerospace sie erstellt
 
 **Vorteile Fixed Order:**
 - Einfacher zu maintainen (kein sbar.remove() benötigt)
 - Konsistente Reihenfolge (muscle memory)
-- Semantische Zuordnung (Letters vs Numbers)
-- Separator macht Gruppierung visuell klar
+- Semantische Zuordnung (QWERT Top, ASDFG Bottom)
+- Separator macht Reihenfolge visuell klar
 
 **Testing:**
-- ✅ Alle 14 Workspaces vorhanden (E,T,C,B,M,1-9)
-- ✅ Separator zwischen M und 1
+- ✅ Alle QWERTZ-Workspaces vorhanden (QWERT / ASDFG)
+- ✅ Separator zwischen QWERT und ASDFG
 - ✅ Workspace-Highlighting funktioniert
 - ✅ App-Icons werden korrekt angezeigt
-- ✅ Reihenfolge: `space.E, space.T, space.C, space.B, space.M, monitor_separator, space.1...space.9`
+- ✅ Reihenfolge: `space.Q … space.T, separator, space.A … space.G, space.X/Y/Z (falls aktiv)`
 
 **Dateien modifiziert:**
 ```
 configs/sketchybar/
 ├── helpers/aerospace_batch.lua    # query_with_monitors() hinzugefügt
-└── items/spaces.lua                # Fixed order E,T,C,B,M,│,1-9
+└── items/spaces.lua                # Fixed order Q,W,E,R,T,│,A,S,D,F,G,(X/Y/Z)
 ```
 
 ### Nächster Schritt
@@ -800,20 +793,10 @@ Phase 5 starten: Scripts Migration (move-all-to-workspace, etc.)
 - `move-node-to-workspace X`
 - `move-node-to-monitor next/prev`
 
-#### **Layout Toggle**
+#### **Layout Umschalten**
 
-**Yabai:** BSP ↔ Stack
-**Aerospace:** tiles ↔ accordion ↔ floating
-
-**Script:** `scripts/layout-cycle.sh`
-
-```bash
-#!/bin/bash
-# Cycle: tiles → accordion → floating → tiles
-
-current=$(aerospace list-workspaces --focused)
-# TODO: Implementierung
-```
+**Yabai:** Ein Toggle-Script (BSP ↔ Stack)
+**Aerospace:** Drei Einzel-Skripte für Tiles horizontal (`layout-tiles-horizontal.sh`), Tiles vertical (`layout-tiles-vertical.sh`) und Accordion-Toggle (`layout-accordion-toggle.sh`). Floating bleibt über Hyper+Cmd+Enter.
 
 #### **Display Circular**
 
@@ -859,7 +842,7 @@ Bereits built-in, kein separates Script nötig.
 **Script-Reduktion: 18 → 6 Scripts (67% weniger!)**
 
 **Migrierte Scripts:**
-1. `layout-toggle.sh` - Aerospace Layouts (tiles/accordion/floating)
+1. `layout-tiles-horizontal.sh`, `layout-tiles-vertical.sh`, `layout-accordion-toggle.sh` - Direkte Layout-Umschaltung
 2. `balance-toggle.sh` - Simplified, nutzt `aerospace balance-sizes`
 3. `sketchybar-reset.sh` - Identisch kopiert
 4. `claude-notify-hook.sh` - Identisch kopiert
@@ -890,14 +873,16 @@ scripts/
 ├── README.md                    # NEU: Dokumentation
 ├── balance-toggle.sh            # NEU: 20 Zeilen (war 242!)
 ├── claude-notify-hook.sh        # Kopiert
-├── layout-toggle.sh             # NEU: 61 Zeilen (war 63)
+├── layout-tiles-horizontal.sh   # NEU
+├── layout-tiles-vertical.sh     # NEU
+├── layout-accordion-toggle.sh   # NEU
 ├── rollback-to-yabai.sh         # Phase 1
 ├── sketchybar-reset.sh          # Kopiert
 └── toggle-myping-skill.sh       # Kopiert
 ```
 
 **Alle Scripts getestet:**
-- ✅ layout-toggle.sh: Cycle durch alle Layouts funktioniert
+- ✅ layout-tiles-*.sh & layout-accordion-toggle.sh: direkte Layout-Wechsel funktionieren
 - ✅ balance-toggle.sh: Fenster-Größen ausgleichen funktioniert
 - ✅ sketchybar-reset.sh: Neustart funktioniert
 - ✅ claude-notify-hook.sh: Unverändert
@@ -993,20 +978,16 @@ brew uninstall skhd
 ### 7.1 Funktions-Tests
 
 #### **Keyboard Shortcuts**
-- [ ] Alle Focus-Shortcuts (Hyper + Pfeile)
-- [ ] Alle Swap-Shortcuts (Hyper+ + Pfeile)
+- [ ] Alle Focus-Shortcuts (Hyper + Pfeile bzw. N/M)
+- [ ] Alle Swap-Shortcuts (Hyper+ + Pfeile bzw. N/M)
 - [ ] Layout-Toggle (Hyper + K)
-- [ ] Workspace-Switch (Hyper + [1-9,C,M,B,E,T])
-- [ ] Window-Movement (Hyper+ + [1-9,C,M,B,E,T])
-- [ ] Display-Management (Hyper + I)
+- [ ] Workspace-Switch (Hyper + [Q,W,E,R,T,A,S,D,F,G])
+- [ ] Window-Movement (Hyper+ + [Q,W,E,R,T,A,S,D,F,G])
+- [ ] Display-Management (Hyper + I/O/U/P)
 
 #### **Workspaces**
-- [ ] Workspace 1-9 funktionieren
-- [ ] Workspace C (Code) funktioniert
-- [ ] Workspace M (Music) funktioniert
-- [ ] Workspace B (Browser) funktioniert
-- [ ] Workspace E (Email) funktioniert
-- [ ] Workspace T (Terminal) funktioniert
+- [ ] Alle QWERTZ-Workspaces (Q,W,E,R,T,A,S,D,F,G) verfügbar
+- [ ] Overflow-Workspaces (X/Y/Z) erscheinen bei Bedarf
 - [ ] Automatische App-Zuordnung funktioniert
 
 #### **Window Management**
@@ -1278,6 +1259,32 @@ sketchybar --query bar
 sketchybar --reload
 aerospace reload-config
 ```
+
+### Problem: App-Icons erscheinen erst nach Workspace-Wechsel (✅ GELÖST 2025-11-12)
+
+**Symptom:** Icons aktualisieren nur bei manuellem `aerospace workspace X`, nicht bei Window-Open/Close
+
+**Root Cause:**
+- `workspace_force_refresh` Event wurde getriggert, aber kein Handler subscribed
+- Nur `aerospace_workspace_change` Handler existierte (triggert nur bei User-WS-Wechsel)
+
+**Lösung:**
+```lua
+-- In spaces.lua: Zweiter Handler für workspace_force_refresh
+space_window_observer:subscribe("workspace_force_refresh", function(env)
+  aerospace_batch:refresh()
+  sbar.delay(0.15, function()  -- 150ms für AeroSpace State-Update
+    aerospace_batch:query_with_monitors(function(batch_data)
+      -- Icon-Update Logic (MUSS identisch zu aerospace_workspace_change sein!)
+    end)
+  end)
+end)
+```
+
+**Wichtig:**
+- Logic in beiden Handlern identisch (besonders App-Icon-Generation: `local app = window.app or "Unknown"`)
+- 150ms Delay gibt AeroSpace Zeit
+- Polling (2s) als Fallback
 
 ### Problem: Battery-Drain erhöht
 

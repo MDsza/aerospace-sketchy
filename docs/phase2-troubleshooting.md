@@ -48,6 +48,7 @@ Coordinate: AppBundle/initAppBundle.swift:15:14 initAppBundle()
 ```bash
 killall AeroSpace
 open -a AeroSpace
+aerospace reload-config   # ohne Reload bleibt Aerospace auf Default-Workspaces hängen
 ```
 **Ergebnis:** Gleicher Fehler
 

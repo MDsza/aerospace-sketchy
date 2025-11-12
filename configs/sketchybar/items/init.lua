@@ -1,7 +1,13 @@
 require("items.apple")
-require("items.spaces")      -- Erstellt auch front_app am Ende
--- require("items.front_app") -- MOVED TO spaces.lua
+require("items.spaces")
 require("items.notch")
 require("items.menus")
 require("items.widgets")
 require("items.media")
+
+sbar.subscribe("app_launched", function(env)
+  sbar.trigger("workspace_force_refresh", { APP = env.APP_NAME or "" })
+end)
+sbar.subscribe("app_terminated", function(env)
+  sbar.trigger("workspace_force_refresh", { APP = env.APP_NAME or "" })
+end)

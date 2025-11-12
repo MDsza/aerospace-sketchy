@@ -24,30 +24,6 @@ for i in "${!QWERTZ_ORDER[@]}"; do
   fi
 done
 
-# If not QWERTZ, check if numeric
-if [[ "$CURRENT" =~ ^[0-9]+$ ]]; then
-  # Get all numeric workspaces, sorted
-  NUMERIC_WS=($(aerospace list-workspaces --all | grep -E '^[0-9]+$' | sort -n))
-
-  # Find current index
-  for i in "${!NUMERIC_WS[@]}"; do
-    if [[ "${NUMERIC_WS[$i]}" == "$CURRENT" ]]; then
-      PREV_INDEX=$(( (i - 1 + ${#NUMERIC_WS[@]}) % ${#NUMERIC_WS[@]} ))
-      PREV="${NUMERIC_WS[$PREV_INDEX]}"
-
-      # If we're at first numeric and going back, go to last QWERTZ (G)
-      if [[ $i -eq 0 ]]; then
-        PREV="G"
-      fi
-
-      # Move and follow
-      aerospace move-node-to-workspace "$PREV"
-      aerospace workspace "$PREV"
-      exit 0
-    fi
-  done
-fi
-
 # Fallback: move to G (last QWERTZ) and follow
 aerospace move-node-to-workspace G
 aerospace workspace G

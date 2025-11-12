@@ -125,7 +125,7 @@ Alt + h/l     → Zwischen Terminal und Safari wechseln
 **Lösung:**
 1. System Settings → Privacy & Security → Accessibility
 2. Aerospace aktivieren (Checkbox ✓)
-3. Aerospace neu starten: `killall AeroSpace && open -a AeroSpace`
+3. Aerospace neu starten: `killall AeroSpace && open -a AeroSpace && aerospace reload-config`
 
 ---
 
@@ -176,6 +176,7 @@ aerospace reload-config
 killall AeroSpace
 sleep 2
 open -a AeroSpace
+aerospace reload-config   # WICHTIG: sonst lädt Aerospace die Default-Workspaces!
 ```
 
 **Falls weiterhin Probleme:**
@@ -198,7 +199,7 @@ cd ~/MyCloud/TOOLs/aerospace+sketchy
 
 **Nächster Schritt:** Phase 3 - Config Migration
 - Hyper-Shortcuts konfigurieren (Karabiner CapsLock)
-- Workspace-Mapping (1-9 + C/M/B/E/T)
+- Workspace-Mapping (Q W E R T / A S D F G + Overflow X/Y/Z)
 - Window Rules portieren
 - App-Zuordnungen
 

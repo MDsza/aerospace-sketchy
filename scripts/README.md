@@ -2,14 +2,29 @@
 
 **Migration von Yabai → Aerospace**
 
+## System Health & Verification
+
+### **`verify-symlinks.sh`** - Config Symlink Checker
+- Prüft ob Aerospace + Sketchybar Configs korrekt symlinked sind
+- **IMMER vor Config-Edits ausführen!**
+- Verhindert Config-Desynchronisation
+- **Usage:** `./verify-symlinks.sh`
+- Exit Code 0 = OK, 1 = Fehler gefunden
+
+**Symptom wenn Symlink fehlt:**
+- Config-Änderungen wirken nicht
+- `aerospace reload-config` bringt nichts
+- Edit in `configs/` wirkt nicht auf `~/.aerospace.toml`
+
 ## Migrierte Scripts (Aerospace-kompatibel)
 
 ### Layout & Window Management
 
-**`layout-toggle.sh`** - Layout-Wechsel für Aerospace
-- Cycles: tiles horizontal → tiles vertical → accordion horizontal → accordion vertical → floating
-- **Shortcut:** Hyper + Backslash (in ~/.aerospace.toml konfigurieren)
-- **Usage:** `./layout-toggle.sh`
+**Layout Scripts (Tiles/Accordion)**
+- `layout-tiles-horizontal.sh` → Hyper + H
+- `layout-tiles-vertical.sh` → Hyper + V
+- `layout-accordion-toggle.sh` → Hyper + K (Accordion ↔ letzter Tiles-Zustand)
+- Alle Skripte setzen den Layoutmodus direkt; Floating erfolgt weiterhin über `Hyper+CMD+Enter`.
 
 **`balance-toggle.sh`** - Fenster-Größen ausgleichen
 - Nutzt Aerospace `balance-sizes` Command
@@ -71,8 +86,10 @@ Füge diese Bindings in `~/.aerospace.toml` hinzu:
 
 ```toml
 [mode.main.binding]
-# Layout Toggle
-ctrl-alt-shift-backslash = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-toggle.sh'
+# Layouts
+ctrl-alt-shift-h = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-tiles-horizontal.sh'
+ctrl-alt-shift-v = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-tiles-vertical.sh'
+ctrl-alt-shift-k = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-accordion-toggle.sh'
 
 # Balance Toggle
 ctrl-alt-shift-o = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/balance-toggle.sh'
@@ -82,7 +99,7 @@ ctrl-alt-shift-o = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sket
 
 | Funktion | Yabai-Setup | Aerospace-Setup | Status |
 |----------|-------------|-----------------|--------|
-| Layout Toggle | BSP ↔ Stack (63 Zeilen) | tiles/accordion/floating (61 Zeilen) | ✅ Migriert |
+| Layout (separate Scripts) | BSP ↔ Stack (63 Zeilen) | Tiles/Accordion (3 Skripte) | ✅ Migriert |
 | Balance Toggle | Floating Grid Logic (242 Zeilen!) | balance-sizes (20 Zeilen) | ✅ Vereinfacht |
 | Window Movement | 3 Scripts (circular) | Aerospace built-in | ✅ Native |
 | Space Management | 2 Scripts (fix/delete) | Nicht nötig | ✅ Obsolet |
@@ -93,9 +110,9 @@ ctrl-alt-shift-o = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sket
 ## Testing
 
 Alle Scripts getestet ✅:
-- ✅ layout-toggle.sh funktioniert
+- ✅ layout-tiles-horizontal.sh / layout-tiles-vertical.sh / layout-accordion-toggle.sh funktionieren
 - ✅ balance-toggle.sh funktioniert
-- ✅ sketchybar-reset.sh funktioniert
+- ✅ sketchybar-reset.sh + refresh-aerospace-sketchy.sh funktionieren
 - ✅ claude-notify-hook.sh funktioniert
 - ✅ toggle-myping-skill.sh funktioniert
 - ✅ rollback-to-yabai.sh funktioniert (Phase 1 getestet)

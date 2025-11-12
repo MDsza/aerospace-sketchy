@@ -139,7 +139,17 @@ end
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
+  update_freq = 2,
 })
+space_window_observer:subscribe("routine", function()
+  sbar.trigger("workspace_force_refresh")
+end)
+space_window_observer:subscribe("window_created", function(env)
+  sbar.trigger("workspace_force_refresh")
+end)
+space_window_observer:subscribe("window_destroyed", function(env)
+  sbar.trigger("workspace_force_refresh")
+end)
 
 local spaces_indicator = sbar.add("item", {
   padding_left = -3,
@@ -300,6 +310,67 @@ space_window_observer:subscribe("aerospace_workspace_change", function(env)
         end)
       end
     end
+  end)
+end)
+
+-- Subscribe workspace_force_refresh to same handler (triggered by window_created, window_destroyed, app_launched, app_terminated)
+space_window_observer:subscribe("workspace_force_refresh", function(env)
+  aerospace_batch:refresh()
+
+  -- Delay slightly so Aerospace state is consistent
+  sbar.delay(0.15, function()
+    aerospace_batch:query_with_monitors(function(batch_data)
+      if not batch_data or not batch_data.workspaces or not batch_data.windows then
+        return
+      end
+
+      -- Update app icons for all workspaces
+      for _, workspace_info in ipairs(batch_data.workspaces) do
+        local workspace_name = workspace_info.name
+
+        -- Skip non-QWERTZ/XYZ workspaces
+        if not workspace_name:match("^[QWERTASDFGXYZ]$") and not workspace_name:match("^%d+$") then
+          goto continue
+        end
+
+        -- Skip if workspace item doesn't exist yet
+        if not spaces[workspace_name] then
+          goto continue
+        end
+
+        -- Build app icons for this workspace (same logic as aerospace_workspace_change)
+        local icon_line = ""
+        local apps = {}
+
+        -- Collect apps for this workspace
+        for _, window in ipairs(batch_data.windows) do
+          if window.workspace == workspace_name then
+            local app = window.app or "Unknown"
+            apps[app] = (apps[app] or 0) + 1
+          end
+        end
+
+        -- Generate icon line
+        local no_app = true
+        for app, count in pairs(apps) do
+          no_app = false
+          local lookup = app_icons[app]
+          local icon = ((lookup == nil) and app_icons["Default"] or lookup)
+          icon_line = icon_line .. icon
+        end
+
+        if no_app then
+          icon_line = " —"
+        end
+
+        -- Update space label
+        sbar.animate("tanh", 10, function()
+          spaces[workspace_name]:set({ label = icon_line })
+        end)
+
+        ::continue::
+      end
+    end)
   end)
 end)
 

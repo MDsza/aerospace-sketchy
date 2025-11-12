@@ -21,7 +21,7 @@ Dieses Projekt dokumentiert die Migration eines produktiven Yabai+SKHD+Sketchyba
 
 ### Ziel
 - **Aerospace:** i3-inspirierter Window Manager
-- **Virtuelle Workspaces:** 1-9 + C/M/B/E/T (Hybrid)
+- **Virtuelle Workspaces:** Fixes QWERTZ-Layout (Q W E R T / A S D F G) + Overflow X/Y/Z
 - **Built-in Shortcuts:** Kein separater SKHD
 - **Sketchybar:** Angepasst für Aerospace
 - **Karabiner:** Beibehalten für Hyper-Key
@@ -93,38 +93,64 @@ Accessibility-Permission toggle OFF/ON!
 ### Phase 3: Konfiguration
 
 ```bash
-# Config aus diesem Projekt
-cp configs/aerospace.toml ~/.aerospace.toml
+# 🔴 WICHTIG: Symlink erstellen (NICHT kopieren!)
+# Damit Edits im Projekt sofort wirken
+rm -f ~/.aerospace.toml
+ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/aerospace.toml ~/.aerospace.toml
 
-# Sketchybar anpassen
-# TODO: Nach Config-Migration
+# Verify Symlink
+ls -la ~/.aerospace.toml
+# Erwartung: lrwxr-xr-x ... -> .../configs/aerospace.toml
+
+# Sketchybar ist bereits symlinked (Phase 4)
+ls -la ~/.config/sketchybar
+# Erwartung: lrwxr-xr-x ... -> .../configs/sketchybar
 ```
+
+**⚠️ NIEMALS `cp` verwenden! Nur Symlinks!**
+- **Grund:** Edits im Projekt müssen sofort wirken
+- **Sonst:** Config-Desynchronisation → Änderungen wirkungslos
 
 ## Workspace-Konzept
 
-### Hybrid-System (1-9 + Buchstaben)
+### Fixes QWERTZ-System (Q W E R T / A S D F G)
 
 ```
-1-9  → Standard Workspaces
-C    →  Code (VS Code, Terminal, IDEs)
-M    →  Music (Spotify, iTunes, Audio)
-B    →  Browser (Safari, Firefox, Chrome)
-E    → ✉ Email (Mail.app, Outlook)
-T    →  Terminal (dediziert Shell-Sessions)
+Q  → Quick Notes / Obsidian / Research
+W  → Work / Citrix / Business Apps
+E  → Email / Messaging
+R  → Reserved / Meetings
+T  → Terminal (Shared)
+A  → AI / IDEs / Code
+S  → Search / Browser
+D  → Do / Productivity
+F  → Files / Finder
+G  → General / Sandbox
+
+Overflow: X/Y/Z werden automatisch erstellt, wenn Monitore zusätzliche Workspaces benötigen.
 ```
 
-### Shortcuts (Geplant)
+### Shortcuts (produktiver Stand)
 
 Siehe [SHORTCUTS.md](SHORTCUTS.md) für vollständige Transition-Übersicht.
 
 **Beispiele:**
 ```
-Hyper + [1-9,C,M,B,E,T]   → Workspace wechseln
-Hyper+ + [1-9,C,M,B,E,T]  → Fenster zu Workspace
-Hyper + Pfeile            → Fenster fokussieren
-Hyper+ + Pfeile           → Fenster tauschen
-Hyper + K                 → Layout toggle (tiles/accordion/float)
+Hyper + [Q,W,E,R,T,A,S,D,F,G]   → Workspace wechseln
+Hyper+ + [Q,W,E,R,T,A,S,D,F,G]  → Fenster in Workspace verschieben (mit Follow)
+Hyper + N / M                  → Vorheriges / nächstes Fenster im Workspace
+Hyper+ + N / M                 → Fenster tauschen (links/rechts)
+Hyper + Pfeile                 → Fokus hoch/runter
+Hyper+ + Pfeile                → Fenster tauschen hoch/runter
+Hyper + H / V / K             → Tiles horizontal / Tiles vertical / Accordion (toggle mit letztem Tiles-Zustand)
 ```
+
+### Sketchybar Workspace-Leiste (Final)
+
+- Reihenfolge: `Q W E R T | A S D F G` (Separator = vertikaler Strich), dahinter ggf. `X/Y/Z` wenn Overflow-Workspaces existieren.
+- Jeder Buchstabe ist das Icon des jeweiligen Workspaces, die **Label-Zeile zeigt die aktiven Apps** als SF-Symbols aus `configs/sketchybar/helpers/app_icons.lua` (z. B. Obsidian = Tropfen, Citrix = Koffer, VS Code/Claude = Spirale/Stern).
+- Die Workspace-Items werden dynamisch aus `configs/sketchybar/items/spaces.lua` erzeugt, reagieren auf `aerospace_workspace_change` und setzen bei Klick sofort `aerospace workspace <LETTER>`.
+- Rechts neben dem Workspace-Block befindet sich nur noch das Menü/Apple-Icon; der Front-App-Name wird über die macOS-Menüleiste angezeigt (kein separates Sketchybar-Item mehr).
 
 ## Wichtige Unterschiede zu Yabai
 
@@ -252,23 +278,6 @@ sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=A
 ```
 
 **📖 Details:** [docs/TROUBLESHOOTING.md - Workspace-Probleme](docs/TROUBLESHOOTING.md#️-workspace-probleme)
-
----
-
-#### ⚠️ Front_app (Programm-Name) links statt rechts
-**Symptom:** "Code", "Finder" etc. erscheint links statt rechts nach G
-
-**Quick Fix:**
-```bash
-# 1. Prüfe ob front_app.lua existiert (darf NICHT!)
-mv ~/.config/sketchybar/items/front_app.lua \
-   ~/.config/sketchybar/items/front_app.lua.disabled
-
-# 2. Kompletter Restart (NICHT aerospace reload-config!)
-brew services restart sketchybar
-```
-
-**📖 Details:** [docs/TROUBLESHOOTING.md - Front_app Position](docs/TROUBLESHOOTING.md#problem-front_app-programm-name-links-statt-rechts-nach-g)
 
 ---
 

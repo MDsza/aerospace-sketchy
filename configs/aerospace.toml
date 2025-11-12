@@ -74,12 +74,6 @@ ctrl-alt-shift-right = 'focus right'
 ctrl-alt-shift-up = 'focus up'
 ctrl-alt-shift-down = 'focus down'
 
-# Alternative: Vim-Keys (Hyper + h/k) - J/L für Workspace-Navigation reserviert
-ctrl-alt-shift-h = 'focus left'
-ctrl-alt-shift-k = 'focus up'
-# J/L: Workspace prev/next (siehe unten bei Workspace Navigation)
-
-# ----------------------------------------------------------------------------
 # SWAP WINDOWS (Hyper+ + Arrow Keys)
 # ----------------------------------------------------------------------------
 ctrl-alt-shift-cmd-left = 'move left'
@@ -87,68 +81,56 @@ ctrl-alt-shift-cmd-right = 'move right'
 ctrl-alt-shift-cmd-up = 'move up'
 ctrl-alt-shift-cmd-down = 'move down'
 
-# Alternative: Vim-Keys (Hyper+ + h/k) - J/L für Workspace-Move reserviert
-ctrl-alt-shift-cmd-h = 'move left'
-ctrl-alt-shift-cmd-k = 'move up'
-# J/L: Move window to workspace prev/next (siehe unten)
-
 # ----------------------------------------------------------------------------
-# WORKSPACE NAVIGATION (Hyper + Number/Letter)
+# WORKSPACE NAVIGATION (Hyper + QWERT/ASDFG)
 # ----------------------------------------------------------------------------
 
-# Numbers 1-9
-ctrl-alt-shift-1 = 'workspace 1'
-ctrl-alt-shift-2 = 'workspace 2'
-ctrl-alt-shift-3 = 'workspace 3'
-ctrl-alt-shift-4 = 'workspace 4'
-ctrl-alt-shift-5 = 'workspace 5'
-ctrl-alt-shift-6 = 'workspace 6'
-ctrl-alt-shift-7 = 'workspace 7'
-ctrl-alt-shift-8 = 'workspace 8'
-ctrl-alt-shift-9 = 'workspace 9'
+# Top Row: QWERT
+ctrl-alt-shift-q = 'workspace Q'
+ctrl-alt-shift-w = 'workspace W'
+ctrl-alt-shift-e = 'workspace E'
+ctrl-alt-shift-r = 'workspace R'
+ctrl-alt-shift-t = 'workspace T'
 
-# Letters (Hybrid Workspaces)
-ctrl-alt-shift-c = 'workspace C'    # Code
-ctrl-alt-shift-m = 'workspace M'    # Music
-ctrl-alt-shift-b = 'workspace B'    # Browser
-ctrl-alt-shift-e = 'workspace E'    # Email
-ctrl-alt-shift-t = 'workspace T'    # Terminal
+# Home Row: ASDFG
+ctrl-alt-shift-a = 'workspace A'
+ctrl-alt-shift-s = 'workspace S'
+ctrl-alt-shift-d = 'workspace D'
+ctrl-alt-shift-f = 'workspace F'
+ctrl-alt-shift-g = 'workspace G'
 
-# Workspace Previous/Next (Hyper + J/L wie bei Yabai)
-ctrl-alt-shift-j = 'workspace --wrap-around prev'   # Previous Workspace
-ctrl-alt-shift-l = 'workspace --wrap-around next'   # Next Workspace
+# Workspace Previous/Next (Hyper + J/L) – respektiert QWERT-Order via Scripts
+ctrl-alt-shift-j = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-prev.sh'
+ctrl-alt-shift-l = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-next.sh'
 
 # ----------------------------------------------------------------------------
-# MOVE WINDOW TO WORKSPACE (Hyper+ + Number/Letter)
+# MOVE WINDOW TO WORKSPACE (Hyper+ + QWERT/ASDFG)
 # ----------------------------------------------------------------------------
 
-# Numbers 1-9
-ctrl-alt-shift-cmd-1 = 'move-node-to-workspace 1'
-ctrl-alt-shift-cmd-2 = 'move-node-to-workspace 2'
-ctrl-alt-shift-cmd-3 = 'move-node-to-workspace 3'
-ctrl-alt-shift-cmd-4 = 'move-node-to-workspace 4'
-ctrl-alt-shift-cmd-5 = 'move-node-to-workspace 5'
-ctrl-alt-shift-cmd-6 = 'move-node-to-workspace 6'
-ctrl-alt-shift-cmd-7 = 'move-node-to-workspace 7'
-ctrl-alt-shift-cmd-8 = 'move-node-to-workspace 8'
-ctrl-alt-shift-cmd-9 = 'move-node-to-workspace 9'
+# Top Row: QWERT
+ctrl-alt-shift-cmd-q = 'move-node-to-workspace Q'
+ctrl-alt-shift-cmd-w = 'move-node-to-workspace W'
+ctrl-alt-shift-cmd-e = 'move-node-to-workspace E'
+ctrl-alt-shift-cmd-r = 'move-node-to-workspace R'
+ctrl-alt-shift-cmd-t = 'move-node-to-workspace T'
 
-# Letters (Hybrid Workspaces)
-ctrl-alt-shift-cmd-c = 'move-node-to-workspace C'    # Code
-ctrl-alt-shift-cmd-m = 'move-node-to-workspace M'    # Music
-ctrl-alt-shift-cmd-b = 'move-node-to-workspace B'    # Browser
-ctrl-alt-shift-cmd-e = 'move-node-to-workspace E'    # Email
-ctrl-alt-shift-cmd-t = 'move-node-to-workspace T'    # Terminal
+# Home Row: ASDFG
+ctrl-alt-shift-cmd-a = 'move-node-to-workspace A'
+ctrl-alt-shift-cmd-s = 'move-node-to-workspace S'
+ctrl-alt-shift-cmd-d = 'move-node-to-workspace D'
+ctrl-alt-shift-cmd-f = 'move-node-to-workspace F'
+ctrl-alt-shift-cmd-g = 'move-node-to-workspace G'
 
-# Move window to Previous/Next Workspace (Hyper+ + J/L wie bei Yabai)
-ctrl-alt-shift-cmd-j = 'move-node-to-workspace --wrap-around prev'   # Previous
-ctrl-alt-shift-cmd-l = 'move-node-to-workspace --wrap-around next'   # Next
+# Move window to Previous/Next Workspace (Hyper+ + J/L) – QWERT-Order
+ctrl-alt-shift-cmd-j = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-prev-follow.sh'
+ctrl-alt-shift-cmd-l = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-next-follow.sh'
 
 # ----------------------------------------------------------------------------
-# LAYOUTS (Hyper + K = Toggle)
+# LAYOUTS (direkt adressierbar)
 # ----------------------------------------------------------------------------
-# NOTE: k already used for focus up, using different key
-# ctrl-alt-shift-k = 'layout tiles horizontal vertical'   # Conflict!
+ctrl-alt-shift-h = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-tiles-horizontal.sh'  # Hyper + H
+ctrl-alt-shift-v = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-tiles-vertical.sh'    # Hyper + V
+ctrl-alt-shift-k = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-accordion-toggle.sh'  # Hyper + K
 
 # Rotation (Hyper + , / .)
 ctrl-alt-shift-comma = 'layout tiles vertical horizontal'   # Hyper + ,
@@ -170,6 +152,9 @@ ctrl-alt-shift-cmd-enter = 'layout floating tiling'         # Hyper+ + Return (F
 # WINDOW zu anderem Monitor verschieben
 ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I → Window to next monitor
 
+# WORKSPACE zu anderem Monitor verschieben (Hauptfunktion Hyper + O)
+ctrl-alt-shift-o = 'move-workspace-to-monitor --wrap-around next'  # Hyper + O → Workspace to next monitor
+
 # FOCUS zwischen Monitoren wechseln (ohne Fenster zu verschieben)
 ctrl-alt-shift-u = 'focus-monitor --wrap-around prev'          # Hyper + U → Focus prev monitor
 ctrl-alt-shift-p = 'focus-monitor --wrap-around next'          # Hyper + P → Focus next monitor
@@ -184,11 +169,12 @@ ctrl-alt-shift-cmd-p = 'move-workspace-to-monitor --wrap-around next'  # Hyper+ 
 ctrl-alt-shift-backslash = 'reload-config'                  # Hyper + \
 
 # ----------------------------------------------------------------------------
-# WORKSPACE CREATION & DELETION (Dynamic Workspaces)
+# WINDOW CYCLING & WORKSPACE CLEANUP
 # ----------------------------------------------------------------------------
-# Hyper + N → Move window to new workspace (finds next available number)
-ctrl-alt-shift-n = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-new-workspace.sh'
-
+# Hyper + N → Fokus auf vorheriges Fenster im aktuellen Workspace
+ctrl-alt-shift-n = 'focus dfs-prev'
+# Hyper + M → Fokus auf nächstes Fenster im aktuellen Workspace
+ctrl-alt-shift-m = 'focus dfs-next'
 # Hyper + Z → Delete current workspace (closes all windows + hides empty workspaces)
 ctrl-alt-shift-z = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/delete-current-workspace.sh'
 
@@ -227,6 +213,7 @@ run = 'layout floating'
 [[on-window-detected]]
 if.app-id = 'pl.maketheweb.cleanshotx'
 run = 'layout floating'
+
 
 # ============================================================================
 # APP-SPECIFIC WORKSPACE ASSIGNMENTS (COMMENTED OUT for now)

@@ -15,18 +15,19 @@ Yabai+SKHD → Aerospace Migration
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
-| Fenster Links fokussieren | Hyper + ← | Hyper + ← | ✅ GLEICH |
-| Fenster Rechts fokussieren | Hyper + → | Hyper + → | ✅ GLEICH |
+| Fenster Links fokussieren | Hyper + ← | Hyper + **N** / ← | ⚠️ ERWEITERT |
+| Fenster Rechts fokussieren | Hyper + → | Hyper + **M** / → | ⚠️ ERWEITERT |
 | Fenster Oben fokussieren | Hyper + ↑ | Hyper + ↑ | ✅ GLEICH |
 | Fenster Unten fokussieren | Hyper + ↓ | Hyper + ↓ | ✅ GLEICH |
-| Fenster Links tauschen | Hyper+ + ← | Hyper+ + ← | ✅ GLEICH |
-| Fenster Rechts tauschen | Hyper+ + → | Hyper+ + → | ✅ GLEICH |
+| Fenster Links tauschen | Hyper+ + ← | Hyper+ + **N** / ← | ⚠️ ERWEITERT |
+| Fenster Rechts tauschen | Hyper+ + → | Hyper+ + **M** / → | ⚠️ ERWEITERT |
 | Fenster Oben tauschen | Hyper+ + ↑ | Hyper+ + ↑ | ✅ GLEICH |
 | Fenster Unten tauschen | Hyper+ + ↓ | Hyper+ + ↓ | ✅ GLEICH |
 
 **✅ Mouse-Follows-Focus:**
 - Alle Focus-Commands zentrieren Maus automatisch auf neuem Fenster
 - Script: `focus-and-center.sh`
+- **Neu:** Hyper+N/M springen sequentiell zum vorherigen bzw. nächsten Fenster im aktuellen Workspace (DFS-Order). Pfeiltasten bleiben weiterhin verfügbar.
 
 ### Toggle-Modi
 
@@ -61,6 +62,8 @@ Yabai+SKHD → Aerospace Migration
 Row 1:  Q    W    E    R    T
 Row 2:  A    S    D    F    G
 ```
+
+**Sketchybar-Darstellung:** Jeder Buchstabe erscheint als eigenes Item; die Label-Zeile zeigt alle Apps, die auf diesem Workspace laufen (Icons werden aus `configs/sketchybar/helpers/app_icons.lua` geladen).
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
@@ -166,7 +169,7 @@ Intelligente Workspace-Erstellung verhindert numerische Workspaces:
 |----------|------------|-----------|--------|
 | Config neu laden | Hyper + \ | Hyper + \ | ✅ GLEICH |
 | Doppelklick Apple-Logo | ❌ N/A | **Kompletter Reload** | ✅ NEU |
-| Workspace erstellen | Hyper + N | ❌ Deaktiviert | ❌ ENTFÄLLT |
+| Fenster vorheriges/nächstes | Hyper + N / M | **Hyper + N / M** | ✅ NEU |
 | Workspace löschen | Hyper + Z | ❌ Deaktiviert | ❌ ENTFÄLLT |
 
 **✅ NEU: Apple-Logo Doppelklick**
@@ -174,9 +177,9 @@ Intelligente Workspace-Erstellung verhindert numerische Workspaces:
 - Force-Kill + Lock-File-Remove
 - Korrigiert Front-App-Position
 
-**❌ Hyper+N/Z deaktiviert:**
-- Nicht mehr nötig mit Fixed QWERTZ-Layout (Q-G) + Overflow (X-Z)
-- Workspaces sind immutable names
+**ℹ️ Hyper+N/M:**
+- Springen jetzt per DFS-Order zum vorherigen/nächsten Fenster des aktuellen Workspaces.
+- Hyper+Z löscht weiterhin den aktuellen Workspace (nur bei Overflow nutzen!).
 
 ---
 
@@ -326,9 +329,9 @@ Z - Monitor 3+ Overflow
 - Overflow-Workspaces X/Y/Z verstehen
 
 ### Woche 3: Layout-System
-- **Hyper+K** für tiles ↔ accordion
-- Unterschied zu Yabai BSP/Stack verstehen
-- Workflows anpassen (tiles für Code, accordion für Fullscreen-Apps)
+- **Hyper+H/V** bewusst einsetzen (Tiles horizontal/vertical)
+- **Hyper+K** toggelt Accordion ↔ letzter Tiles-Zustand
+- Floating bleibt separat auf Hyper+⌘+Enter
 
 ---
 
@@ -338,7 +341,7 @@ Z - Monitor 3+ Overflow
 **Lösung:** QWERTZ-Layout (Q-G) ersetzt numerische Workspaces. Muscle Memory umlernen.
 
 ### ❌ "Hyper+N macht nichts!"
-**Lösung:** Deaktiviert. Fixed QWERTZ-Layout benötigt keine dynamischen Workspaces.
+**Lösung:** Hyper+N/M springen nun zum vorherigen/nächsten Fenster des aktuellen Workspaces. Pfeiltasten bleiben für Richtungs-Fokus verfügbar.
 
 ### ❌ "Programmname (Code) links von Workspaces!"
 **Lösung:** Doppelklick auf Apple-Logo (🍎) → Kompletter Reload korrigiert Position.

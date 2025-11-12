@@ -1,54 +1,13 @@
 #!/bin/bash
-# Speichere als ~/.config/sketchybar/plugins/apple_click_handler.sh
+# Apple-Logo Doppelklick Handler → Sanfter Refresh (kein Kill)
 
-# Debug-Ausgabe in Log-Datei
-exec 2>>/tmp/sketchybar_apple_handler.log
-echo "$(date): Script ausgeführt" >>/tmp/sketchybar_apple_handler.log
+PROJECT_ROOT="/Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy"
+REFRESH_SCRIPT="$PROJECT_ROOT/scripts/refresh-aerospace-sketchy.sh"
 
-# Definiere absolute Pfade
-CONFIG_DIR="$HOME/.config/sketchybar"
-RESTART_SCRIPT="$CONFIG_DIR/plugins/restart_services.sh"
-MENU_SCRIPT="$CONFIG_DIR/helpers/menus/bin/menus"
-TEMP_FILE="/tmp/apple_click_count"
-
-# Lese aktuelle Klick-Zählung
-COUNT=$(cat "$TEMP_FILE" 2>/dev/null || echo "0")
-echo "Aktuelle Klick-Zählung: $COUNT" >>/tmp/sketchybar_apple_handler.log
-
-# Erhöhe Zählung
-COUNT=$((COUNT+1))
-echo "$COUNT" > "$TEMP_FILE"
-
-# Prüfe auf Doppelklick
-if [ "$COUNT" -eq 2 ]; then
-  # Doppelklick erkannt, führe Neustart aus
-  echo "Doppelklick erkannt, starte Neustart-Skript" >>/tmp/sketchybar_apple_handler.log
-  
-  if [ -x "$RESTART_SCRIPT" ]; then
-    "$RESTART_SCRIPT"
-  else
-    echo "FEHLER: Neustart-Skript nicht ausführbar: $RESTART_SCRIPT" >>/tmp/sketchybar_apple_handler.log
-    # Fallback: EMPFOHLENE METHODE (brew services restart)
-    pkill -9 AeroSpace 2>/dev/null
-    killall -9 sketchybar lua 2>/dev/null
-    sleep 2
-    brew services restart sketchybar
-    sleep 1
-    open -a AeroSpace
-  fi
-  
-  # Setze Zählung zurück
-  echo "0" > "$TEMP_FILE"
-else
-  # Erster Klick, führe das originale Skript aus
-  echo "Erster Klick, führe originales Menü-Skript aus" >>/tmp/sketchybar_apple_handler.log
-  
-  if [ -x "$MENU_SCRIPT" ]; then
-    "$MENU_SCRIPT" -s 0
-  else
-    echo "FEHLER: Menü-Skript nicht gefunden oder nicht ausführbar: $MENU_SCRIPT" >>/tmp/sketchybar_apple_handler.log
-  fi
-  
-  # Starte Timer zum Zurücksetzen
-  (sleep 0.5 && echo "0" > "$TEMP_FILE") &
+if [ ! -x "$REFRESH_SCRIPT" ]; then
+  osascript -e 'display notification "Refresh-Script nicht gefunden!" with title "Apple-Logo"' >/dev/null 2>&1 || true
+  exit 1
 fi
+
+"$REFRESH_SCRIPT" &
+exit 0
