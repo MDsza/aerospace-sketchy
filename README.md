@@ -116,16 +116,23 @@ ls -la ~/.config/sketchybar
 ### Fixes QWERTZ-System (Q W E R T / A S D F G)
 
 ```
-Q  → Quick Notes / Obsidian / Research
-W  → Work / Citrix / Business Apps
-E  → Email / Messaging
-R  → Reserved / Meetings
-T  → Terminal (Shared)
-A  → AI / IDEs / Code
-S  → Search / Browser
-D  → Do / Productivity
-F  → Files / Finder
-G  → General / Sandbox
+### 3.1 Workspace-Setup (QWERTZ Fixlayout)
+
+**Mapping (10 feste Workspaces + Overflow):**
+```
+Q  → Quick Notes:  Obsidian / Research
+W  → Work: Citrix
+E  → Email: Messaging / Outlook
+R  → Meetings: Reserved
+T  → Terminal
+A  → AI: IDEs / VS Code
+S  → Search: Browser
+D  → Do: Productivity
+F  → Files: Finder
+G  → General: ...
+Overflow (X/Y/Z) → Automatisch bei Mehrmonitorbedarf
+
+
 
 Overflow: X/Y/Z werden automatisch erstellt, wenn Monitore zusätzliche Workspaces benötigen.
 ```
@@ -138,8 +145,9 @@ Siehe [SHORTCUTS.md](SHORTCUTS.md) für vollständige Transition-Übersicht.
 ```
 Hyper + [Q,W,E,R,T,A,S,D,F,G]   → Workspace wechseln
 Hyper+ + [Q,W,E,R,T,A,S,D,F,G]  → Fenster in Workspace verschieben (mit Follow)
-Hyper + N / M                  → Vorheriges / nächstes Fenster im Workspace
-Hyper+ + N / M                 → Fenster tauschen (links/rechts)
+Hyper + N / M                  → Vorheriger / nächster Workspace
+Hyper + J / L                  → Vorheriges / nächstes Fenster (Karussell, wrap-around)
+Hyper+ + N / M                 → Fenster in vorherigen/nächsten Workspace verschieben (mit Follow)
 Hyper + Pfeile                 → Fokus hoch/runter
 Hyper+ + Pfeile                → Fenster tauschen hoch/runter
 Hyper + H / V / K             → Tiles horizontal / Tiles vertical / Accordion (toggle mit letztem Tiles-Zustand)
@@ -150,7 +158,8 @@ Hyper + H / V / K             → Tiles horizontal / Tiles vertical / Accordion 
 - Reihenfolge: `Q W E R T | A S D F G` (Separator = vertikaler Strich), dahinter ggf. `X/Y/Z` wenn Overflow-Workspaces existieren.
 - Jeder Buchstabe ist das Icon des jeweiligen Workspaces, die **Label-Zeile zeigt die aktiven Apps** als SF-Symbols aus `configs/sketchybar/helpers/app_icons.lua` (z. B. Obsidian = Tropfen, Citrix = Koffer, VS Code/Claude = Spirale/Stern).
 - Die Workspace-Items werden dynamisch aus `configs/sketchybar/items/spaces.lua` erzeugt, reagieren auf `aerospace_workspace_change` und setzen bei Klick sofort `aerospace workspace <LETTER>`.
-- Rechts neben dem Workspace-Block befindet sich nur noch das Menü/Apple-Icon; der Front-App-Name wird über die macOS-Menüleiste angezeigt (kein separates Sketchybar-Item mehr).
+- **Links:** Apple-Logo unmittelbar gefolgt von Workspace-Items (Q W E R T | A S D F G)
+- **Rechts:** Widgets (CPU, Memory, Network, Battery) + Claude-Notifier
 
 ## Wichtige Unterschiede zu Yabai
 

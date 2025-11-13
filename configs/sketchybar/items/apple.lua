@@ -2,8 +2,9 @@ local colors = require("colors")
 local icons = require("icons")
 local settings = require("settings")
 -- Padding item required because of bracket
-sbar.add("item", { width = 5 })
+sbar.add("item", { position = "left", width = 5 })
 local apple = sbar.add("item", {
+  position = "left",
   icon = {
     font = { size = 16.0 },
     string = icons.apple,
@@ -31,4 +32,4 @@ sbar.add("bracket", { apple.name }, {
   }
 })
 -- Padding item required because of bracket
-sbar.add("item", { width = 7 })
+sbar.add("item", { position = "left", width = 7 })

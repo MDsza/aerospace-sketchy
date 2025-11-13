@@ -67,41 +67,45 @@ outer.right = 0
 [mode.main.binding]
 
 # ----------------------------------------------------------------------------
-# FOCUS (Hyper + Arrow Keys)
+# FOCUS (Hyper + Arrow Keys) + Mouse follows + Circular wrap-around
 # ----------------------------------------------------------------------------
-ctrl-alt-shift-left = 'focus left'
-ctrl-alt-shift-right = 'focus right'
-ctrl-alt-shift-up = 'focus up'
-ctrl-alt-shift-down = 'focus down'
+ctrl-alt-shift-left = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh left'
+ctrl-alt-shift-right = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh right'
+ctrl-alt-shift-up = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-and-center.sh up'
+ctrl-alt-shift-down = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-and-center.sh down'
 
-# SWAP WINDOWS (Hyper+ + Arrow Keys)
+# SWAP WINDOWS (Hyper+ + Arrow Keys + J/L)
 # ----------------------------------------------------------------------------
 ctrl-alt-shift-cmd-left = 'move left'
 ctrl-alt-shift-cmd-right = 'move right'
 ctrl-alt-shift-cmd-up = 'move up'
 ctrl-alt-shift-cmd-down = 'move down'
 
+# SWAP WINDOWS Sequential (Hyper+ + J/L) - same as Left/Right
+ctrl-alt-shift-cmd-j = 'move left'
+ctrl-alt-shift-cmd-l = 'move right'
+
 # ----------------------------------------------------------------------------
 # WORKSPACE NAVIGATION (Hyper + QWERT/ASDFG)
 # ----------------------------------------------------------------------------
 
-# Top Row: QWERT
-ctrl-alt-shift-q = 'workspace Q'
-ctrl-alt-shift-w = 'workspace W'
-ctrl-alt-shift-e = 'workspace E'
-ctrl-alt-shift-r = 'workspace R'
-ctrl-alt-shift-t = 'workspace T'
+# Top Row: QWERT + Mouse follows
+ctrl-alt-shift-q = ['workspace Q', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-w = ['workspace W', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-e = ['workspace E', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-r = ['workspace R', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-t = ['workspace T', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
 
-# Home Row: ASDFG
-ctrl-alt-shift-a = 'workspace A'
-ctrl-alt-shift-s = 'workspace S'
-ctrl-alt-shift-d = 'workspace D'
-ctrl-alt-shift-f = 'workspace F'
-ctrl-alt-shift-g = 'workspace G'
+# Home Row: ASDFG + Mouse follows
+ctrl-alt-shift-a = ['workspace A', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-s = ['workspace S', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-d = ['workspace D', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-f = ['workspace F', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+ctrl-alt-shift-g = ['workspace G', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
 
-# Workspace Previous/Next (Hyper + J/L) – respektiert QWERT-Order via Scripts
-ctrl-alt-shift-j = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-prev.sh'
-ctrl-alt-shift-l = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-next.sh'
+# Workspace Previous/Next (Hyper + N/M) – respektiert QWERT-Order via Scripts
+ctrl-alt-shift-n = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-prev.sh'
+ctrl-alt-shift-m = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-next.sh'
 
 # ----------------------------------------------------------------------------
 # MOVE WINDOW TO WORKSPACE (Hyper+ + QWERT/ASDFG)
@@ -121,9 +125,9 @@ ctrl-alt-shift-cmd-d = 'move-node-to-workspace D'
 ctrl-alt-shift-cmd-f = 'move-node-to-workspace F'
 ctrl-alt-shift-cmd-g = 'move-node-to-workspace G'
 
-# Move window to Previous/Next Workspace (Hyper+ + J/L) – QWERT-Order
-ctrl-alt-shift-cmd-j = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-prev-follow.sh'
-ctrl-alt-shift-cmd-l = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-next-follow.sh'
+# Move window to Previous/Next Workspace (Hyper+ + N/M) – QWERT-Order
+ctrl-alt-shift-cmd-n = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-prev-follow.sh'
+ctrl-alt-shift-cmd-m = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-next-follow.sh'
 
 # ----------------------------------------------------------------------------
 # LAYOUTS (direkt adressierbar)
@@ -155,9 +159,9 @@ ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I → W
 # WORKSPACE zu anderem Monitor verschieben (Hauptfunktion Hyper + O)
 ctrl-alt-shift-o = 'move-workspace-to-monitor --wrap-around next'  # Hyper + O → Workspace to next monitor
 
-# FOCUS zwischen Monitoren wechseln (ohne Fenster zu verschieben)
-ctrl-alt-shift-u = 'focus-monitor --wrap-around prev'          # Hyper + U → Focus prev monitor
-ctrl-alt-shift-p = 'focus-monitor --wrap-around next'          # Hyper + P → Focus next monitor
+# FOCUS zwischen Monitoren wechseln (ohne Fenster zu verschieben) + Mouse follows
+ctrl-alt-shift-u = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh prev'  # Hyper + U → Focus prev monitor + center mouse
+ctrl-alt-shift-p = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh next'  # Hyper + P → Focus next monitor + center mouse
 
 # WORKSPACE zwischen Monitoren verschieben (Option 2 - Dynamisch!)
 ctrl-alt-shift-cmd-u = 'move-workspace-to-monitor --wrap-around prev'  # Hyper+ + U → Move WS to prev monitor
@@ -171,10 +175,11 @@ ctrl-alt-shift-backslash = 'reload-config'                  # Hyper + \
 # ----------------------------------------------------------------------------
 # WINDOW CYCLING & WORKSPACE CLEANUP
 # ----------------------------------------------------------------------------
-# Hyper + N → Fokus auf vorheriges Fenster im aktuellen Workspace
-ctrl-alt-shift-n = 'focus dfs-prev'
-# Hyper + M → Fokus auf nächstes Fenster im aktuellen Workspace
-ctrl-alt-shift-m = 'focus dfs-next'
+# Hyper + J → Fokus auf vorheriges Fenster (Circular) + Mouse follows
+# NOTE: Using circular navigation - wraps around at edges (last → first, first → last)
+ctrl-alt-shift-j = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh right'
+# Hyper + L → Fokus auf nächstes Fenster (Circular) + Mouse follows
+ctrl-alt-shift-l = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh left'
 # Hyper + Z → Delete current workspace (closes all windows + hides empty workspaces)
 ctrl-alt-shift-z = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/delete-current-workspace.sh'
 
@@ -216,36 +221,145 @@ run = 'layout floating'
 
 
 # ============================================================================
-# APP-SPECIFIC WORKSPACE ASSIGNMENTS (COMMENTED OUT for now)
+# APP-SPECIFIC WORKSPACE ASSIGNMENTS (QWERTZ Schema)
 # ============================================================================
+#
+# Layout: Q W E R T (obere Reihe) / A S D F G (Home-Row)
+# + Overflow: X Y Z (bei Mehrmonitorbedarf automatisch)
 
-# NOTE: Auto-assignment disabled initially, enable manually per app as needed
-# Reason: May interfere with manual workspace management
+# ----------------------------------------------------------------------------
+# Q = Quick Notes / Research
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'md.obsidian'
+run = 'move-node-to-workspace Q'
 
-# # Workspace C: Code
-# [[on-window-detected]]
-# if.app-id = 'com.microsoft.VSCode'
-# run = 'move-node-to-workspace C'
+# ----------------------------------------------------------------------------
+# W = Work / Business Apps
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.citrix.receiver.nomas'
+run = 'move-node-to-workspace W'
 
-# # Workspace M: Music
-# [[on-window-detected]]
-# if.app-id = 'com.spotify.client'
-# run = 'move-node-to-workspace M'
+[[on-window-detected]]
+if.app-id = 'com.citrixonline.mac.WebexTeams'
+run = 'move-node-to-workspace W'
 
-# # Workspace B: Browser
-# [[on-window-detected]]
-# if.app-id = 'com.apple.Safari'
-# run = 'move-node-to-workspace B'
+# ----------------------------------------------------------------------------
+# E = Email / Messaging / Communication
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.apple.mail'
+run = 'move-node-to-workspace E'
 
-# # Workspace E: Email
-# [[on-window-detected]]
-# if.app-id = 'com.apple.mail'
-# run = 'move-node-to-workspace E'
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+run = 'move-node-to-workspace E'
 
-# # Workspace T: Terminal
-# [[on-window-detected]]
-# if.app-id = 'com.apple.Terminal'
-# run = 'move-node-to-workspace T'
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace E'
+
+[[on-window-detected]]
+if.app-id = 'com.hnc.Discord'
+run = 'move-node-to-workspace E'
+
+# ----------------------------------------------------------------------------
+# R = Meetings / Reserved
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'us.zoom.xos'
+run = 'move-node-to-workspace R'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = 'move-node-to-workspace R'
+
+# ----------------------------------------------------------------------------
+# T = Terminal (Shared)
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.apple.Terminal'
+run = 'move-node-to-workspace T'
+
+[[on-window-detected]]
+if.app-id = 'com.googlecode.iterm2'
+run = 'move-node-to-workspace T'
+
+[[on-window-detected]]
+if.app-id = 'net.kovidgoyal.kitty'
+run = 'move-node-to-workspace T'
+
+# ----------------------------------------------------------------------------
+# A = AI / IDEs / Development
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.microsoft.VSCode'
+run = 'move-node-to-workspace A'
+
+[[on-window-detected]]
+if.app-id = 'com.jetbrains.pycharm'
+run = 'move-node-to-workspace A'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.dt.Xcode'
+run = 'move-node-to-workspace A'
+
+# ----------------------------------------------------------------------------
+# S = Search / Browser
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.apple.Safari'
+run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-id = 'org.mozilla.firefox'
+run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-id = 'company.thebrowser.Browser'
+run = 'move-node-to-workspace S'
+
+# ----------------------------------------------------------------------------
+# D = Do / Productivity
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.notion.id'
+run = 'move-node-to-workspace D'
+
+[[on-window-detected]]
+if.app-id = 'com.todoist.mac.Todoist'
+run = 'move-node-to-workspace D'
+
+[[on-window-detected]]
+if.app-id = 'com.omnigroup.OmniFocus4'
+run = 'move-node-to-workspace D'
+
+# ----------------------------------------------------------------------------
+# F = Files / Finder
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.apple.finder'
+run = 'move-node-to-workspace F'
+
+[[on-window-detected]]
+if.app-id = 'com.binarynights.ForkLift-3'
+run = 'move-node-to-workspace F'
+
+# ----------------------------------------------------------------------------
+# G = General / Everything Else
+# ----------------------------------------------------------------------------
+[[on-window-detected]]
+if.app-id = 'com.spotify.client'
+run = 'move-node-to-workspace G'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.Music'
+run = 'move-node-to-workspace G'
 
 # ============================================================================
 # NOTES

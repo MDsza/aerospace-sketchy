@@ -15,19 +15,19 @@ Yabai+SKHD → Aerospace Migration
 
 | Funktion | Yabai+SKHD | Aerospace | Status |
 |----------|------------|-----------|--------|
-| Fenster Links fokussieren | Hyper + ← | Hyper + **N** / ← | ⚠️ ERWEITERT |
-| Fenster Rechts fokussieren | Hyper + → | Hyper + **M** / → | ⚠️ ERWEITERT |
+| Fenster Links fokussieren | Hyper + ← | Hyper + **J** / ← | ⚠️ ERWEITERT |
+| Fenster Rechts fokussieren | Hyper + → | Hyper + **L** / → | ⚠️ ERWEITERT |
 | Fenster Oben fokussieren | Hyper + ↑ | Hyper + ↑ | ✅ GLEICH |
 | Fenster Unten fokussieren | Hyper + ↓ | Hyper + ↓ | ✅ GLEICH |
-| Fenster Links tauschen | Hyper+ + ← | Hyper+ + **N** / ← | ⚠️ ERWEITERT |
-| Fenster Rechts tauschen | Hyper+ + → | Hyper+ + **M** / → | ⚠️ ERWEITERT |
+| Fenster Links tauschen | Hyper+ + ← | Hyper+ + **J** / ← | ⚠️ ERWEITERT |
+| Fenster Rechts tauschen | Hyper+ + → | Hyper+ + **L** / → | ⚠️ ERWEITERT |
 | Fenster Oben tauschen | Hyper+ + ↑ | Hyper+ + ↑ | ✅ GLEICH |
 | Fenster Unten tauschen | Hyper+ + ↓ | Hyper+ + ↓ | ✅ GLEICH |
 
 **✅ Mouse-Follows-Focus:**
 - Alle Focus-Commands zentrieren Maus automatisch auf neuem Fenster
-- Script: `focus-and-center.sh`
-- **Neu:** Hyper+N/M springen sequentiell zum vorherigen bzw. nächsten Fenster im aktuellen Workspace (DFS-Order). Pfeiltasten bleiben weiterhin verfügbar.
+- Script: `focus-and-center.sh` (directional), `focus-circular.sh` (circular wrap-around)
+- **Geändert 2025-11-14:** Hyper+J/L nutzen jetzt `focus-circular.sh` (Karussell mit wrap-around). Pfeiltasten aktuell ungenutzt.
 
 ### Toggle-Modi
 
@@ -77,8 +77,8 @@ Row 2:  A    S    D    F    G
 | Workspace D (Do) | ❌ N/A | **Hyper + D** | ✅ NEU |
 | Workspace F (Files) | ❌ N/A | **Hyper + F** | ✅ NEU |
 | Workspace G | ❌ N/A | **Hyper + G** | ✅ NEU |
-| Workspace Previous | Hyper + J | Hyper + J | ✅ GLEICH |
-| Workspace Next | Hyper + L | Hyper + L | ✅ GLEICH |
+| Workspace Previous | Hyper + J | Hyper + **N** | ⚠️ GEÄNDERT (2025-11-12) |
+| Workspace Next | Hyper + L | Hyper + **M** | ⚠️ GEÄNDERT (2025-11-12) |
 
 **🔄 Overflow Workspaces (Multi-Monitor):**
 
@@ -104,8 +104,8 @@ Row 2:  A    S    D    F    G
 | Zu Workspace D | ❌ N/A | **Hyper+ + D** | ✅ NEU |
 | Zu Workspace F | ❌ N/A | **Hyper+ + F** | ✅ NEU |
 | Zu Workspace G | ❌ N/A | **Hyper+ + G** | ✅ NEU |
-| Zu Prev Workspace | Hyper+ + J | Hyper+ + J | ✅ GLEICH |
-| Zu Next Workspace | Hyper+ + L | Hyper+ + L | ✅ GLEICH |
+| Zu Prev Workspace | Hyper+ + J | Hyper+ + **N** | ⚠️ GEÄNDERT (2025-11-12) |
+| Zu Next Workspace | Hyper+ + L | Hyper+ + **M** | ⚠️ GEÄNDERT (2025-11-12) |
 
 **✅ Focus-Follow:**
 - Alle move-and-follow Scripts folgen Fenster automatisch
@@ -175,7 +175,7 @@ Intelligente Workspace-Erstellung verhindert numerische Workspaces:
 **✅ NEU: Apple-Logo Doppelklick**
 - Kompletter Reload: Aerospace + Sketchybar
 - Force-Kill + Lock-File-Remove
-- Korrigiert Front-App-Position
+- Sanfter Config-Reload
 
 **ℹ️ Hyper+N/M:**
 - Springen jetzt per DFS-Order zum vorherigen/nächsten Fenster des aktuellen Workspaces.
@@ -373,7 +373,6 @@ brew services restart sketchybar
 **Häufige Probleme:**
 - 🔴 Lock-File-Konflikt (mehrere Lua-Prozesse)
 - ⚠️ Workspaces nicht klickbar / highlighted
-- ⚠️ Front_app Position falsch (links statt rechts)
 - 🐌 Performance-Probleme / Zombie-Prozesse
 
 **Alle Lösungen & Diagnostics:** [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
