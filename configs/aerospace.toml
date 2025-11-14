@@ -42,12 +42,12 @@ exec-on-workspace-change = [
 # ============================================================================
 
 [gaps]
-inner.horizontal = 0
-inner.vertical = 0
-outer.left = 0
-outer.bottom = 30    # SKETCHYBAR_HEIGHT
-outer.top = 0
-outer.right = 0
+inner.horizontal = 5
+inner.vertical = 5
+outer.left = 5
+outer.bottom = 35    # SKETCHYBAR_HEIGHT (30) + Border (5)
+outer.top = 5
+outer.right = 5
 
 # ============================================================================
 # WORKSPACES (Hybrid: 1-9 + C/M/B/E/T)
@@ -157,15 +157,15 @@ ctrl-alt-shift-cmd-enter = 'layout floating tiling'         # Hyper+ + Return (F
 ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I → Window to next monitor
 
 # WORKSPACE zu anderem Monitor verschieben (Hauptfunktion Hyper + O)
-ctrl-alt-shift-o = 'move-workspace-to-monitor --wrap-around next'  # Hyper + O → Workspace to next monitor
+ctrl-alt-shift-o = ['move-workspace-to-monitor --wrap-around next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper + O → Workspace to next monitor + trigger Sketchybar
 
 # FOCUS zwischen Monitoren wechseln (ohne Fenster zu verschieben) + Mouse follows
-ctrl-alt-shift-u = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh prev'  # Hyper + U → Focus prev monitor + center mouse
-ctrl-alt-shift-p = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh next'  # Hyper + P → Focus next monitor + center mouse
+ctrl-alt-shift-u = ['exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh prev', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper + U → Focus prev monitor + trigger Sketchybar
+ctrl-alt-shift-p = ['exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper + P → Focus next monitor + trigger Sketchybar
 
 # WORKSPACE zwischen Monitoren verschieben (Option 2 - Dynamisch!)
-ctrl-alt-shift-cmd-u = 'move-workspace-to-monitor --wrap-around prev'  # Hyper+ + U → Move WS to prev monitor
-ctrl-alt-shift-cmd-p = 'move-workspace-to-monitor --wrap-around next'  # Hyper+ + P → Move WS to next monitor
+ctrl-alt-shift-cmd-u = ['move-workspace-to-monitor --wrap-around prev', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper+ + U → Move WS to prev monitor + trigger Sketchybar
+ctrl-alt-shift-cmd-p = ['move-workspace-to-monitor --wrap-around next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper+ + P → Move WS to next monitor + trigger Sketchybar
 
 # ----------------------------------------------------------------------------
 # SYSTEM / SERVICES

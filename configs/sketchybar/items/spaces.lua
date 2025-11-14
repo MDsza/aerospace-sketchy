@@ -8,6 +8,13 @@ local spaces = {}
 local space_paddings = {}  -- Track padding items for dynamic hiding
 local known_workspaces = {}
 
+-- State for monitor-based grouping
+local last_monitor_assignments = {}  -- workspace → monitor_id (Change-Detection)
+local separator_item = nil           -- Reference zum Separator-Item
+local reorder_pending = false        -- Debounce-Lock
+local pending_reorder_data = nil     -- Queued reorder if pending=true
+local workspace_window_counts = {}   -- workspace → window_count (shared state!)
+
 -- Workspace labels (QWERTZ Layout + Overflow X/Y/Z)
 local workspace_labels = {
   -- Row 1
@@ -27,6 +34,137 @@ local workspace_labels = {
   Y = "Y",
   Z = "Z"
 }
+
+-- Sort function (QWERTZ Layout order: Q W E R T A S D F G X Y Z, then numbers)
+local function workspace_sort_key(name)
+  -- QWERTZ workspace order mapping
+  local qwertz_order = {
+    Q = "01", W = "02", E = "03", R = "04", T = "05",
+    A = "06", S = "07", D = "08", F = "09", G = "10",
+    X = "11", Y = "12", Z = "13"  -- Overflow workspaces
+  }
+
+  -- Check if it's a QWERTZ/XYZ workspace
+  if qwertz_order[name] then
+    return "0" .. qwertz_order[name]  -- QWERTZ + XYZ first
+  end
+
+  -- Numeric workspaces come after QWERTZ/XYZ
+  local num = tonumber(name)
+  if num then
+    return string.format("1%03d", num)
+  end
+
+  -- Any other workspaces (fallback)
+  return "2" .. name
+end
+
+-- Helper: Build shared window counts state
+local function build_workspace_window_counts(batch_data)
+  workspace_window_counts = {}  -- Reset
+  for _, win in ipairs(batch_data.windows) do
+    local ws = win.workspace
+    workspace_window_counts[ws] = (workspace_window_counts[ws] or 0) + 1
+  end
+end
+
+-- Helper: Group workspaces by monitor
+local function group_workspaces_by_monitor(batch_data)
+  local groups = {}
+  local monitor_order = {}
+
+  -- Sort monitors: Built-in first, then by ID
+  local sorted_monitors = {}
+  for _, mon in ipairs(batch_data.monitors) do
+    table.insert(sorted_monitors, mon)
+  end
+  table.sort(sorted_monitors, function(a, b)
+    if a.is_builtin ~= b.is_builtin then
+      return a.is_builtin  -- Built-in first
+    end
+    return a.id < b.id
+  end)
+
+  -- Build monitor_order and groups structure
+  for _, mon in ipairs(sorted_monitors) do
+    table.insert(monitor_order, mon.id)
+    groups[mon.id] = {
+      workspaces = {},
+      name = mon.name,
+      is_builtin = mon.is_builtin
+    }
+  end
+
+  -- Group workspaces by monitor_id
+  for _, ws_info in ipairs(batch_data.workspaces) do
+    local mid = ws_info.monitor_id
+    if groups[mid] then
+      table.insert(groups[mid].workspaces, ws_info.name)
+    end
+  end
+
+  -- Sort workspaces within each group by QWERTZ order
+  for _, group_data in pairs(groups) do
+    table.sort(group_data.workspaces, function(a, b)
+      return workspace_sort_key(a) < workspace_sort_key(b)
+    end)
+  end
+
+  return {
+    monitor_order = monitor_order,
+    groups = groups
+  }
+end
+
+-- Helper: Check if monitor topology changed
+local function has_monitor_topology_changed(batch_data)
+  for _, ws_info in ipairs(batch_data.workspaces) do
+    if last_monitor_assignments[ws_info.name] ~= ws_info.monitor_id then
+      return true
+    end
+  end
+  return false
+end
+
+-- Helper: Update monitor assignments state (after successful reorder)
+local function update_monitor_assignments_state(batch_data)
+  for _, ws_info in ipairs(batch_data.workspaces) do
+    last_monitor_assignments[ws_info.name] = ws_info.monitor_id
+  end
+end
+
+-- Helper function to create monitor separator
+local function create_monitor_separator()
+  if not separator_item then  -- Create only once!
+    separator_item = sbar.add("item", "workspace.separator", {
+      position = "left",
+      icon = {
+        string = "│",
+        color = colors.grey,
+        font = { size = 20.0 }
+      },
+      label = { drawing = false },
+      background = { drawing = false },
+      padding_left = 8,
+      padding_right = 8,
+    })
+  end
+  return separator_item
+end
+
+-- Forward declaration (needed for recursive call in execute_reorder_with_queue)
+local reorder_items_by_monitor_groups
+local execute_reorder_with_queue
+
+-- Helper function to ensure workspace items exist before reorder
+local function ensure_workspace_items_exist(workspace_names)
+  for _, ws_name in ipairs(workspace_names) do
+    if not known_workspaces[ws_name] then
+      -- First time seeing this workspace -> create items
+      create_workspace_item(ws_name)
+    end
+  end
+end
 
 -- Helper function to create a workspace item dynamically
 local function create_workspace_item(workspace_name)
@@ -135,6 +273,100 @@ local function create_workspace_item(workspace_name)
   return space
 end
 
+-- Reorder workspace items by monitor groups (differential update)
+function reorder_items_by_monitor_groups(monitor_groups, focused_workspace)
+  -- Ensure separator exists
+  create_monitor_separator()
+
+  -- Build flat ordered list from monitor_groups
+  local ordered_workspaces = {}
+  local separator_position = -1
+
+  for i, monitor_id in ipairs(monitor_groups.monitor_order) do
+    local group = monitor_groups.groups[monitor_id]
+    for _, ws in ipairs(group.workspaces) do
+      table.insert(ordered_workspaces, ws)
+    end
+
+    -- Insert separator after first monitor group (if multi-monitor)
+    if i == 1 and #monitor_groups.monitor_order > 1 then
+      separator_position = #ordered_workspaces
+    end
+  end
+
+  -- Ensure all workspace items exist (handles new Overflow X/Y/Z)
+  ensure_workspace_items_exist(ordered_workspaces)
+
+  -- Build reorder command: interleave main + padding items
+  local all_items = {}
+  for i, ws in ipairs(ordered_workspaces) do
+    -- Add main item first, then padding (preserves original creation order)
+    if spaces[ws] then
+      table.insert(all_items, spaces[ws].name)
+    end
+    if space_paddings[ws] then
+      table.insert(all_items, space_paddings[ws].name)
+    end
+
+    -- Insert separator after first monitor group
+    if i == separator_position then
+      table.insert(all_items, separator_item.name)
+    end
+  end
+
+  -- Execute single reorder for all items
+  if #all_items > 0 then
+    sbar.exec("sketchybar --reorder " .. table.concat(all_items, " "))
+  end
+
+  -- Update separator visibility
+  local visible_monitor_count = 0
+  for monitor_id, group in pairs(monitor_groups.groups) do
+    local has_visible = false
+    for _, ws in ipairs(group.workspaces) do
+      if (workspace_window_counts[ws] or 0) > 0 or ws == focused_workspace then
+        has_visible = true
+        break
+      end
+    end
+    if has_visible then
+      visible_monitor_count = visible_monitor_count + 1
+    end
+  end
+
+  separator_item:set({drawing = (visible_monitor_count > 1) and "on" or "off"})
+end
+
+-- Execute reorder with queue-based debounce
+function execute_reorder_with_queue(monitor_groups, focused_workspace, batch_data)
+  if reorder_pending then
+    -- Queue this reorder for later execution
+    pending_reorder_data = {
+      monitor_groups = monitor_groups,
+      focused_workspace = focused_workspace,
+      batch_data = batch_data
+    }
+    return  -- Don't execute now
+  end
+
+  -- Execute reorder
+  reorder_pending = true
+  reorder_items_by_monitor_groups(monitor_groups, focused_workspace)
+  update_monitor_assignments_state(batch_data)
+
+  -- Release lock after 100ms + execute queued reorder if exists
+  sbar.delay(0.1, function()
+    reorder_pending = false
+
+    -- Execute queued reorder if one was pending
+    if pending_reorder_data then
+      local queued = pending_reorder_data
+      pending_reorder_data = nil
+      execute_reorder_with_queue(queued.monitor_groups, queued.focused_workspace, queued.batch_data)
+    end
+  end)
+end
+
 
 local space_window_observer = sbar.add("item", {
   drawing = false,
@@ -150,28 +382,6 @@ end)
 space_window_observer:subscribe("window_destroyed", function(env)
   sbar.trigger("workspace_force_refresh")
 end)
-
-local spaces_indicator = sbar.add("item", {
-  padding_left = -3,
-  padding_right = 0,
-  icon = {
-    padding_left = 8,
-    padding_right = 9,
-    color = colors.grey,
-    string = icons.switch.on,
-  },
-  label = {
-    width = 0,
-    padding_left = 0,
-    padding_right = 8,
-    string = "Spaces",
-    color = colors.bg1,
-  },
-  background = {
-    color = colors.with_alpha(colors.grey, 0.0),
-    border_color = colors.with_alpha(colors.bg1, 0.0),
-  }
-})
 
 -- Window change observer with dynamic workspace discovery
 space_window_observer:subscribe("aerospace_workspace_change", function(env)
@@ -214,6 +424,17 @@ space_window_observer:subscribe("aerospace_workspace_change", function(env)
       ::continue::
     end
 
+    -- Build shared state FIRST (used by visibility + separator)
+    build_workspace_window_counts(batch_data)
+
+    -- Check if monitor topology changed
+    local monitor_groups = group_workspaces_by_monitor(batch_data)
+    local topology_changed = has_monitor_topology_changed(batch_data)
+
+    if topology_changed then
+      execute_reorder_with_queue(monitor_groups, batch_data.focused_workspace, batch_data)
+    end
+
     -- Sort function (QWERTZ Layout order: Q W E R T A S D F G X Y Z, then numbers)
     local function workspace_sort_key(name)
       -- QWERTZ workspace order mapping
@@ -251,21 +472,16 @@ space_window_observer:subscribe("aerospace_workspace_change", function(env)
     end
 
     -- DYNAMIC HIDING: Hide/show workspace items based on window count
-    -- Build a map of workspaces with windows
-    local workspaces_with_windows = {}
-    for _, window in ipairs(batch_data.windows) do
-      workspaces_with_windows[window.workspace] = true
-    end
+    -- Use shared workspace_window_counts (already built via build_workspace_window_counts)
 
     -- Update visibility for all created workspace items
     for ws_name, space_item in pairs(spaces) do
-      local has_windows = workspaces_with_windows[ws_name] == true
-      local is_qwertz_workspace = ws_name:match("^[QWERTASDFGXYZ]$")
+      local has_windows = (workspace_window_counts[ws_name] or 0) > 0
       local is_focused = ws_name == batch_data.focused_workspace
 
-      -- Show if: has windows, is QWERTZ/XYZ workspace, or is currently focused
-      -- Hide if: empty numeric workspace
-      local should_show = has_windows or is_qwertz_workspace or is_focused
+      -- Show only if: has windows OR is currently focused
+      -- Remove QWERTZ/XYZ exemption!
+      local should_show = has_windows or is_focused
 
       space_item:set({ drawing = should_show and "on" or "off" })
 
@@ -322,6 +538,17 @@ space_window_observer:subscribe("workspace_force_refresh", function(env)
     aerospace_batch:query_with_monitors(function(batch_data)
       if not batch_data or not batch_data.workspaces or not batch_data.windows then
         return
+      end
+
+      -- Build shared state
+      build_workspace_window_counts(batch_data)
+
+      -- Lightweight monitor change check (with queue-based debounce!)
+      local topology_changed = has_monitor_topology_changed(batch_data)
+
+      if topology_changed then
+        local monitor_groups = group_workspaces_by_monitor(batch_data)
+        execute_reorder_with_queue(monitor_groups, batch_data.focused_workspace, batch_data)
       end
 
       -- Update app icons for all workspaces
@@ -420,87 +647,8 @@ aerospace_batch:query_with_monitors(function(batch_data)
     create_workspace_item(ws_name)
   end
 
-  -- Create Front App item AFTER all workspaces
-  local front_app = sbar.add("item", "front_app", {
-    position = "left",
-    icon = { drawing = false },
-    label = {
-      font = {
-        family = settings.font.text,
-        style = settings.font.style_map["Bold"],
-        size = 13.0,
-      },
-      color = colors.white,
-      padding_left = 20,
-      padding_right = 10,
-    },
-    background = {
-      color = colors.transparent,
-    },
-    updates = true,
-  })
-
-  -- Update on front app switch
-  front_app:subscribe("front_app_switched", function(env)
-    front_app:set({ label = { string = env.INFO } })
-  end)
-
-  -- Update on workspace change
-  front_app:subscribe("aerospace_workspace_change", function(env)
-    sbar.exec("aerospace list-windows --focused --format '%{app-name}'", function(result)
-      local app_name = result:match("^%s*(.-)%s*$")
-      if app_name and app_name ~= "" then
-        front_app:set({ label = { string = app_name } })
-      else
-        front_app:set({ label = { string = "—" } })
-      end
-    end)
-  end)
-
-  -- Click handler
-  front_app:subscribe("mouse.clicked", function(env)
-    sbar.trigger("swap_menus_and_spaces")
-  end)
-
   -- Trigger initial workspace change event
   if batch_data.focused_workspace then
     sbar.trigger("aerospace_workspace_change", { FOCUSED_WORKSPACE = batch_data.focused_workspace })
   end
-end)
-
-spaces_indicator:subscribe("swap_menus_and_spaces", function(env)
-  local currently_on = spaces_indicator:query().icon.value == icons.switch.on
-  spaces_indicator:set({
-    icon = currently_on and icons.switch.off or icons.switch.on
-  })
-end)
-
-spaces_indicator:subscribe("mouse.entered", function(env)
-  sbar.animate("tanh", 30, function()
-    spaces_indicator:set({
-      background = {
-        color = { alpha = 0.0 },
-        border_color = { alpha = 0.0 },
-      },
-      icon = { color = colors.bg1 },
-      label = { width = "dynamic" }
-    })
-  end)
-end)
-
-spaces_indicator:subscribe("mouse.exited", function(env)
-  sbar.animate("tanh", 30, function()
-    spaces_indicator:set({
-      background = {
-        color = { alpha = 0.0 },
-        border_color = { alpha = 0.0 },
-      },
-      icon = { color = colors.grey },
-      label = { width = 0, }
-    })
-  end)
-end)
-
-spaces_indicator:subscribe("mouse.clicked", function(env)
-  sbar.trigger("swap_menus_and_spaces")
 end)
