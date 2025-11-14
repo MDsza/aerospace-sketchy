@@ -48,8 +48,8 @@ sleep 0.5
 # Fokus zurück auf vorherigen Workspace (sorgt für Events)
 aerospace workspace "$CURRENT_WS" >/dev/null 2>&1 || true
 
-# 4) Borders optional erneut starten (falls Script existiert)
-if [ -x "$PROJECT_ROOT/scripts/start-borders.sh" ]; then
+# 4) Borders optional erneut starten (falls Script existiert UND AeroSpace nicht pausiert)
+if [ -x "$PROJECT_ROOT/scripts/start-borders.sh" ] && [ ! -f /tmp/aerospace-paused-state ]; then
   "$PROJECT_ROOT/scripts/start-borders.sh" >/tmp/borders_refresh.log 2>&1 || true
 fi
 
@@ -59,7 +59,6 @@ sketchybar --reload >/tmp/sketchybar_reload.log 2>&1 || true
 
 sleep 0.5
 sketchybar --trigger aerospace_workspace_change "FOCUSED_WORKSPACE=$CURRENT_WS" >/dev/null 2>&1 || true
-sketchybar --trigger front_app_switched "INFO=$CURRENT_APP" >/dev/null 2>&1 || true
 sleep 0.5
 sketchybar --trigger workspace_force_refresh >/dev/null 2>&1 || true
 

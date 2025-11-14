@@ -471,7 +471,7 @@ space_window_observer:subscribe("aerospace_workspace_change", function(env)
       end
     end
 
-    -- DYNAMIC HIDING: Hide/show workspace items based on window count
+    -- DYNAMIC VISIBILITY: Always show workspaces, but dim empty ones
     -- Use shared workspace_window_counts (already built via build_workspace_window_counts)
 
     -- Update visibility for all created workspace items
@@ -479,15 +479,21 @@ space_window_observer:subscribe("aerospace_workspace_change", function(env)
       local has_windows = (workspace_window_counts[ws_name] or 0) > 0
       local is_focused = ws_name == batch_data.focused_workspace
 
-      -- Show only if: has windows OR is currently focused
-      -- Remove QWERTZ/XYZ exemption!
-      local should_show = has_windows or is_focused
+      -- Dim empty workspaces (unless focused)
+      local should_dim = not has_windows and not is_focused
 
-      space_item:set({ drawing = should_show and "on" or "off" })
+      -- ALWAYS visible, but dim icon color for empty workspaces
+      space_item:set({
+        drawing = "on",  -- Always visible (changed from conditional!)
+        icon = {
+          color = should_dim and 0xff6e6e6e or  -- Dimmed gray (empty)
+                  (is_focused and 0xffffffff or 0xffcad3f5)  -- White (focused) / Light blue (occupied)
+        }
+      })
 
-      -- Also hide/show padding to avoid gaps
+      -- Padding always visible (prevents gaps)
       if space_paddings[ws_name] then
-        space_paddings[ws_name]:set({ drawing = should_show and "on" or "off" })
+        space_paddings[ws_name]:set({ drawing = "on" })
       end
     end
 

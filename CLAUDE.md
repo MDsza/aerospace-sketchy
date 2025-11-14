@@ -2,525 +2,665 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Projekt-Übersicht
+## 🎯 QUICK START (für neue Claude-Instanzen)
 
-**Status:** Phase 5 ABGESCHLOSSEN ✅ - Production-ready Aerospace-Setup
-**Migration:** Yabai+SKHD → Aerospace+Sketchybar COMPLETED
-**Aktuelle Version:** 1.0 (Production stable seit 2025-11-12)
-
-**Basis-Projekt:** `~/MyCloud/TOOLs/yabai-skhd-sbar` (v2.7.2, archiviert als v-yabai-final)
-**Letzte große Updates:** 2025-11-12 (App-Icons Instant-Update, Yabai-Residuen entfernt, Keybindings optimiert)
-
-### Technologie-Stack
-
-**Aktuelles Setup (Production):**
-- **Window Manager:** Aerospace 0.19.2-Beta (i3-inspiriert, kein SIP-Disable!)
-- **Status Bar:** Sketchybar (Lua-basiert, Aerospace-integriert)
-- **Key Remapping:** Karabiner-Elements (CapsLock → Hyper)
-- **Config:** TOML (~/.aerospace.toml)
-- **Workspaces:** Fixes QWERTZ-Layout (Q W E R T / A S D F G) + optionale Overflow-Spaces X/Y/Z
-
-**Ersetzte Komponenten:**
-- ~~Yabai (BSP Window Manager)~~ → Aerospace
-- ~~SKHD (Keyboard Daemon)~~ → Aerospace built-in
-- Karabiner BEIBEHALTEN (unverzichtbar für Hyper-Key)
-
-## Architektur & Config-Management
-
-### Zentrale Configs
-
-**Aerospace Config:** `~/.aerospace.toml` (symlinked von `configs/aerospace.toml`)
-- ~260 Zeilen TOML
-- Workspaces: Q W E R T A S D F G (feste QWERTZ-Matrix) + Overflow X/Y/Z
-- Shortcuts: Hyper (ctrl-alt-shift) + Hyper+ (ctrl-alt-shift-cmd)
-- Sketchybar Integration: `exec-on-workspace-change` Trigger + Mauszentrierung
-- Window Rules: Floating für System-Apps (Settings, Raycast, etc.)
-
-**Sketchybar Config:** `~/.config/sketchybar/` (symlinked von `configs/sketchybar/`)
-- Lua-basiert: `sketchybarrc` → `init.lua`
-- **Aerospace Integration:**
-  - `helpers/aerospace_batch.lua` - CLI-Wrapper für Queries
-  - `items/spaces.lua` - Workspace-Items (NICHT native Space-Type!)
-  - Events: `aerospace_workspace_change` + `workspace_force_refresh` (Update der App-Icons bei Fenster-Änderungen)
-- **Layout (Links):** Apple-Logo → Workspaces (Q W E R T | A S D F G, mit Separator) → Overflow X/Y/Z bei Bedarf
-- **App-Icons:** Die Label-Zeile jeder Workspace-Kachel zeigt laufende Apps anhand der Glyphen aus `helpers/app_icons.lua`
-- **Widgets (Rechts):** CPU, Memory, Network, Battery, Claude-Notifier
-
-### Wichtige Architektur-Konzepte
-
-**Aerospace virtuelle Workspaces vs macOS Spaces:**
-- Alle Aerospace-Fenster in EINEM macOS Space (meist Space 1)
-- Mission Control sieht nur 1 Space
-- Aerospace versteckt/zeigt Fenster intern
-- **WICHTIG:** Sketchybar Items als `"item"` Type, NICHT `"space"` Type!
-
-**QWERTZ Workspace-System:**
-```
-Obere Reihe:  Q  W  E  R  T   (Navigation / Kommunikation)
-Untere Reihe: A  S  D  F  G   (Builder / Files / Focus)
-Overflow:     X  Y  Z         (dynamisch für Extra-Monitore)
-
-Alle zehn Haupt-Workspaces existieren dauerhaft in Aerospace (keine macOS Spaces).
-```
-
-## Quick Start für neue Claude-Instanzen
-
-### Daily Commands (am häufigsten benötigt)
-
+**VOR JEDER CONFIG-ÄNDERUNG:**
 ```bash
-# 1. Config-Änderung testen (IMMER ZUERST Symlink-Check!)
-./scripts/verify-symlinks.sh         # ✅ MUSS ✅ sein!
+./scripts/verify-symlinks.sh  # MUSS ✅ sein! Verhindert Config-Desync
+```
+
+**Aerospace Config ändern:**
+```bash
 vim configs/aerospace.toml
 aerospace reload-config
+```
 
-# 2. Sketchybar Config ändern
-vim configs/sketchybar/init.lua      # oder items/spaces.lua etc.
+**Sketchybar Config ändern:**
+```bash
+vim configs/sketchybar/init.lua
 ./scripts/refresh-aerospace-sketchy.sh  # Soft-Reload (EMPFOHLEN)
-# ODER als Fallback bei hartem Problem:
-./scripts/restart_services.sh          # Force-Restart
+# Fallback: ./scripts/restart_services.sh
+```
 
-# 3. Scripts entwickeln/testen
-vim scripts/my-new-script.sh
-chmod +x scripts/my-new-script.sh
-./scripts/my-new-script.sh
-
-# 4. Troubleshooting
+**Troubleshooting Quick-Check:**
+```bash
 ps aux | grep -E '[s]ketchybar' | wc -l  # Sollte 2 sein
 aerospace list-workspaces --all          # Q W E R T A S D F G
 sketchybar --query bar | head -20        # Prüfe Items
 ```
 
-## Häufige Entwicklungsaufgaben
+**Vollständige Diagnostics:** `docs/TROUBLESHOOTING.md`
 
-### Config-Änderungen testen
+---
 
-**🔴 CRITICAL: Symlink-Check ZUERST!**
+## Projekt-Übersicht
 
-```bash
-# IMMER ZUERST prüfen ob Symlinks korrekt sind!
-./scripts/verify-symlinks.sh
-# Erwartung: ✅ Alle Checks passed
-# Falls FEHLER: Script zeigt Fix-Commands
+**Production-ready macOS Window Management Setup**
+- **Window Manager:** Aerospace 0.19.2-Beta (i3-inspiriert, kein SIP-Disable!)
+- **Status Bar:** Sketchybar (Lua-basiert, event-driven Aerospace-Integration)
+- **Key Remapping:** Karabiner-Elements (CapsLock → Hyper)
+- **Workspaces:** QWERTZ-Layout (Q W E R T / A S D F G) + Overflow X/Y/Z
+- **Migration:** Yabai+SKHD → Aerospace (67% weniger Scripts!)
 
-# Dann erst editieren:
-vim configs/aerospace.toml
-aerospace reload-config
+**Basis-Projekt:** `~/MyCloud/TOOLs/yabai-skhd-sbar` (v2.7.2, Tag: v-yabai-final)
 
-# Sketchybar Config ändern → Soft-Reload
-vim configs/sketchybar/init.lua
-./scripts/refresh-aerospace-sketchy.sh
-# Lädt Config neu OHNE Prozess-Kill
+## Architektur-Konzepte
 
-# Prüfe ob sauber (2 Prozesse erwartet):
-ps aux | grep -E '[s]ketchybar' | wc -l  # Sollte 2 sein
+### System-Übersicht & Event-Flow
 
-# Test Workspace-Wechsel triggert Sketchybar:
-aerospace workspace E
-# → Erwartung: Highlighting sofort, App-Icons sofort
+**Aerospace ↔ Sketchybar Integration (Event-Driven Architecture):**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ USER ACTION                                                     │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+         ┌────────────────────┴────────────────────┐
+         │                                         │
+    Hyper+Q                              Window open/close/move
+  (Workspace-Wechsel)                  (App starten/beenden)
+         │                                         │
+         ▼                                         ▼
+┌─────────────────┐                    ┌──────────────────────┐
+│   AEROSPACE     │                    │   SKETCHYBAR         │
+│  workspace Q    │                    │  Window Observer     │
+└─────────────────┘                    └──────────────────────┘
+         │                                         │
+         │ exec-on-workspace-change                │ window_created/
+         │ (aerospace.toml:35-38)                  │ window_destroyed/
+         │                                         │ routine (2s)
+         ▼                                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              SKETCHYBAR EVENT TRIGGERS                          │
+│  --trigger aerospace_workspace_change FOCUSED_WORKSPACE=Q       │
+│  --trigger workspace_force_refresh                              │
+└─────────────────────────────────────────────────────────────────┘
+         │                                         │
+         ▼                                         ▼
+┌─────────────────┐                    ┌──────────────────────┐
+│   HANDLER 1     │                    │    HANDLER 2         │
+│  spaces.lua:304 │                    │  spaces.lua:368      │
+│  (Instant)      │                    │  (150ms Delay!)      │
+└─────────────────┘                    └──────────────────────┘
+         │                                         │
+         └────────────────┬────────────────────────┘
+                          ▼
+        ┌───────────────────────────────────────┐
+        │   AEROSPACE BATCH QUERY SYSTEM        │
+        │   aerospace_batch.lua:query_with_     │
+        │   monitors() - 4 Parallel Queries:    │
+        │   1. list-monitors                    │
+        │   2. list-workspaces --all            │
+        │   3. list-workspaces --focused        │
+        │   4. list-windows --all               │
+        │   → 1s Cache, Completion Callback     │
+        └───────────────────────────────────────┘
+                          │
+         ┌────────────────┴────────────────┐
+         ▼                                 ▼
+┌──────────────────┐           ┌────────────────────────┐
+│ WORKSPACE        │           │ APP-ICONS UPDATE       │
+│ DISCOVERY        │           │ (spaces.lua:417-530)   │
+│ (spaces.lua:387) │           │ - app_icons.lua lookup │
+│ - QWERTZ always  │           │ - SF-Symbols rendering │
+│ - Numerisch      │           │ - :obsidian: :code:    │
+│   on-demand      │           └────────────────────────┘
+└──────────────────┘
+         │
+         ▼
+┌──────────────────┐
+│ MONITOR-BASED    │
+│ GRUPPIERUNG      │
+│ (spaces.lua:494) │
+│ [Q W E R T]  │   │
+│ [Q W E R T]      │
+│  Mon 2   Mon 1   │
+└──────────────────┘
+         │
+         ▼
+┌──────────────────┐
+│ SOFT-DELETE      │
+│ drawing=off      │
+│ (leere WS)       │
+└──────────────────┘
 ```
 
-### Scripts entwickeln/testen
+**CRITICAL:**
+- **Handler 1** (User-WS-Wechsel): Komplettes Rebuild instant
+- **Handler 2** (Window-Events): 150ms Delay für Aerospace State-Update, dann lightweight Icon-Updates
+- **Logic in beiden MUSS identisch sein!** (App-Icon-Generation, Monitor-Gruppierung)
 
+### Lua-Module-Struktur (Sketchybar)
+
+```
+~/.config/sketchybar/
+├─ sketchybarrc → init.lua (Entry Point)
+│
+├─ init.lua (655 Zeilen)
+│  ├─ sbar.begin_config()
+│  ├─ Events definieren (MUSS vor Items!)
+│  │  ├─ claude_waiting_status
+│  │  ├─ aerospace_workspace_change
+│  │  └─ workspace_force_refresh
+│  ├─ require("bar") → Bar-Konfiguration
+│  ├─ require("default") → Default-Styles
+│  ├─ Performance-Module init:
+│  │  ├─ update_manager:init()
+│  │  └─ aerospace_batch:init()
+│  ├─ require("items") → Alle Items laden
+│  └─ sbar.event_loop()
+│
+├─ items/
+│  ├─ init.lua → Items-Loader
+│  ├─ apple.lua → Apple-Logo + Doppelklick Handler
+│  ├─ spaces.lua (655 Zeilen!) → Workspaces, 2 Event-Handler
+│  ├─ menus.lua → Dropdown-Menüs
+│  └─ widgets/
+│     ├─ init.lua
+│     ├─ claude_notifier.lua
+│     ├─ myping_toggle.lua
+│     ├─ cpu.lua, memory.lua, battery.lua, ...
+│     └─ front_app.lua
+│
+└─ helpers/
+   ├─ aerospace_batch.lua → Query-Optimierung (4 parallele Queries, 1s Cache)
+   ├─ app_icons.lua → SF-Symbols Mapping (300+ Apps)
+   ├─ json.lua → JSON Parser
+   ├─ update_manager.lua → Centralized Updates
+   └─ default_font.lua → Font-Definitionen
+```
+
+### Monitor-basierte Workspace-Gruppierung (Feature seit 2025-11-14)
+
+**Sketchybar Order folgt Monitor-Gruppierung:**
+
+```
+Sketchybar (bottom):
+Apple-Logo | [Q W E R T A S D F G]  │  [Q W E R T A S D F G] | Widgets
+             ^^^^ Monitor 2 ^^^^        ^^^^ Monitor 1 ^^^^
+             (Built-in Laptop)          (External Display)
+```
+
+**Navigation (Hyper+N/M) folgt DIESER Reihenfolge!**
+- `workspace-next.sh` / `workspace-prev.sh` nutzen GLEICHE Logic wie Sketchybar
+- Monitor-Wechsel (Workspace → anderer Monitor) triggert Reorder
+- Topology-Detection: `last_monitor_assignments` (spaces.lua:122)
+- Queue-based Debounce: `reorder_pending` (spaces.lua:358)
+
+**Implementation:** spaces.lua:494-546 (Monitor-gruppiertes Reorder)
+
+### Config-Struktur (SYMLINK-basiert!)
+
+**Aerospace:** `~/.aerospace.toml` → `configs/aerospace.toml`
+- 260+ Zeilen TOML
+- Workspaces: Q W E R T A S D F G + Overflow X/Y/Z
+- Shortcuts: Hyper (ctrl-alt-shift) + Hyper+ (ctrl-alt-shift-cmd)
+- `exec-on-workspace-change` triggert Sketchybar
+- Window Rules: Floating für System-Apps
+
+**Sketchybar:** `~/.config/sketchybar` → `configs/sketchybar/`
+- Entry: `sketchybarrc` → `init.lua`
+- Aerospace Integration: `helpers/aerospace_batch.lua`, `items/spaces.lua`
+- Events: `aerospace_workspace_change` (User-WS-Wechsel) + `workspace_force_refresh` (Window-Events)
+- Layout: Apple-Logo | Q W E R T | A S D F G | X/Y/Z | Widgets
+
+**⚠️ CRITICAL:** Configs MÜSSEN Symlinks sein! Siehe "Kritische Lessons Learned" #1.
+
+### Aerospace vs macOS Spaces
+
+**Aerospace nutzt virtuelle Workspaces, NICHT Mission Control Spaces:**
+- Alle Fenster in EINEM macOS Space (meist Space 1)
+- Mission Control zeigt nur 1 Space
+- Aerospace versteckt/zeigt Fenster intern
+- Sketchybar Items als `"item"` Type (NICHT `"space"`!)
+
+### QWERTZ Workspace-System
+
+```
+Obere Reihe:  Q  W  E  R  T   → Navigation/Kommunikation (Obsidian, Citrix, Mail, Terminal)
+Untere Reihe: A  S  D  F  G   → Builder/Produktivität (VS Code, Safari, Finder)
+Overflow:     X  Y  Z         → Dynamisch bei Multi-Monitor
+
+NIEMALS numerische Workspaces (1,2,3...) verwenden! Aerospace erstellt jeden Namen sofort.
+```
+
+## Wichtigste Scripts
+
+### System Health & Config
 ```bash
-# Wichtigste Scripts (Production):
-./scripts/refresh-aerospace-sketchy.sh  # Soft-Reload (EMPFOHLEN für Config-Änderungen)
-./scripts/restart_services.sh           # Force-Restart (Fallback bei Problemen)
-./scripts/verify-symlinks.sh            # Prüft Config-Symlinks (VOR jeder Änderung!)
+./scripts/verify-symlinks.sh            # Config Symlink Check (VOR jedem Edit!)
+./scripts/refresh-aerospace-sketchy.sh  # Soft-Reload (EMPFOHLEN)
+./scripts/restart_services.sh           # Force-Restart mit Zombie-Guards
+```
 
-# Layout-Scripts:
+### Layouts & Windows
+```bash
 ./scripts/layout-tiles-horizontal.sh    # Hyper + H
 ./scripts/layout-tiles-vertical.sh      # Hyper + V
 ./scripts/layout-accordion-toggle.sh    # Hyper + K
-./scripts/balance-toggle.sh             # Hyper+ + O (Balance-Sizes)
-
-# Workspace Navigation (geändert 2025-11-12):
-./scripts/workspace-next.sh             # Hyper + M (war L)
-./scripts/workspace-prev.sh             # Hyper + N (war J)
-./scripts/move-next-follow.sh           # Hyper+ + M (mit Follow, war L)
-./scripts/move-prev-follow.sh           # Hyper+ + N (mit Follow, war J)
-
-# Window Focus Navigation:
-./scripts/focus-circular.sh             # Hyper + J/L (wrap-around, circular)
-./scripts/focus-and-center.sh           # Hyper + Up/Down (directional)
-./scripts/focus-monitor-and-center.sh   # Hyper + U/P (monitor switch + mouse)
-
-# Utility:
-./scripts/move-and-follow.sh            # Move + Follow
-./scripts/center-mouse.sh               # Maus zum Fenster zentrieren (JXA-basiert)
-./scripts/get-app-id.sh                 # App Bundle-ID finden
-
-# Alle Scripts dokumentiert in: scripts/README.md
+./scripts/balance-toggle.sh             # Hyper+ + B
+./scripts/focus-circular.sh             # Hyper + J/L (wrap-around)
+./scripts/center-mouse.sh               # Mouse-Follows-Focus (JXA)
 ```
 
-### Sketchybar Troubleshooting
-
-**Problem: Workspaces nicht klickbar / nicht highlighted**
-
-✅ **GELÖST seit 2025-11-12** mit robustem `restart_services.sh`:
-- Automatische Guards gegen Zombie-Lua-Prozesse
-- Lock-File-Verification vor Restart
-- 5s Timeout für sauberen Exit, Force-Kill bei Bedarf
-
-**Quick Fix (falls doch Probleme):**
+### Workspace Navigation
 ```bash
-# Methode 1: Soft-Reload (EMPFOHLEN)
-./scripts/refresh-aerospace-sketchy.sh
-
-# Methode 2: Force-Restart (Fallback)
-./scripts/restart_services.sh
-
-# Methode 3: Manuell (nur bei hartnäckigen Problemen)
-killall -9 sketchybar lua 2>/dev/null
-sleep 2
-brew services restart sketchybar
+./scripts/workspace-next.sh             # Hyper + M
+./scripts/workspace-prev.sh             # Hyper + N
+./scripts/move-next-follow.sh           # Hyper+ + M
+./scripts/move-prev-follow.sh           # Hyper+ + N
+./scripts/delete-current-workspace.sh   # Workspace löschen (falls nötig)
+./scripts/focus-monitor-and-center.sh   # Hyper + U/P (Monitor wechseln + Mouse center)
 ```
 
-**Diagnostics:**
+**Vollständige Dokumentation:** `scripts/README.md`
+
+## Workflows & Features
+
+### Mouse-Follows-Focus (JXA-basiert)
+
+**Problem:** Aerospace hat KEINE window-x/y Variablen (anders als Yabai)
+
+**Lösung:** `center-mouse.sh` nutzt JXA (JavaScript for Automation):
+
+```javascript
+// JXA Script (center-mouse.sh):
+const app = Application('System Events').applicationProcesses.whose({ frontmost: true })[0];
+const win = app.windows[0];
+const pos = win.position();
+const size = win.size();
+const centerX = pos[0] + size[0] / 2;
+const centerY = pos[1] + size[1] / 2;
+// → cliclick m:X,Y (primary) oder Swift CGWarpMouseCursorPosition (fallback)
+```
+
+**Integration:**
+- Alle Focus-Commands: `exec-and-forget center-mouse.sh` (aerospace.toml:72-75, 93-104)
+- Workspace-Wechsel: Automatisch bei Hyper+Q/W/E/R/T/A/S/D/F/G
+- Monitor-Wechsel: `focus-monitor-and-center.sh` (Hyper+U/P)
+
+**Fallback:** Falls JXA fehlschlägt → Swift CGWarpMouseCursorPosition
+
+### Apple-Logo Klick (Pause/Resume Toggle)
+
+**Trigger:** Einzelklick auf Apple-Logo (Sketchybar)
+
+**Funktion:** Toggelt Aerospace zwischen "aktiv" und "pausiert"
+
+**State-File:** `/tmp/aerospace-paused-state`
+- Existiert = Aerospace pausiert
+- Fehlt = Aerospace aktiv
+
+**Icon-Farben:**
+- Weiß (`0xffffffff`) = Aktiv (Window-Management läuft)
+- Dunkelgrau (`0xff6e6e6e`) = Pausiert (Window-Management gestoppt)
+
+**⚠️ WICHTIG - Aerospace-Befehl (versionsabhängig):**
 ```bash
-ps aux | grep -E '[s]ketchybar' | wc -l  # Erwartung: 2 (Daemon + Lua)
-lsof /tmp/sketchybar_$USER.lock          # Prüft Lock-File
+# Aerospace ≤ 0.19.x (AKTUELL v0.19.2-Beta):
+aerospace enable on/off
+
+# Aerospace ≥ 0.20 (bei Upgrade umstellen!):
+aerospace managed on/off
 ```
 
-Details: `docs/TROUBLESHOOTING.md` + `docs/ZOMBIE-FIX.md`
+**Flow beim Pausieren:**
+1. `aerospace enable off` (Window-Management stoppen)
+2. `killall borders` (Borders beenden)
+3. State-File erstellen
+4. Notification "⏸️ AeroSpace Paused"
+5. Icon dunkelgrau setzen
+
+**Flow beim Reaktivieren:**
+1. `aerospace enable on` (Window-Management starten)
+2. 0.3s Wartezeit
+3. Borders restart (falls vorhanden)
+4. `refresh-aerospace-sketchy.sh` ausführen
+5. State-File löschen
+6. Notification "▶️ AeroSpace Active"
+7. Icon weiß setzen
+
+**Script:** `~/.config/sketchybar/plugins/apple_click_handler.sh`
+
+**Sync nach Sketchybar-Restart:** apple.lua prüft State-File bei `aerospace_workspace_change` Event und setzt Icon-Farbe entsprechend.
+
+### Apple-Logo Doppelklick (Soft-Refresh) - VERALTET
+
+**HINWEIS:** Doppelklick-Funktion wurde durch Single-Klick-Toggle ersetzt!
+
+**Trigger:** Doppelklick auf Apple-Logo (Sketchybar) - **NICHT MEHR AKTIV**
+
+**Script:** `configs/sketchybar/items/apple.lua` → `scripts/apple_click_handler.sh`
+
+**Flow:**
+```bash
+1. verify-symlinks.sh          # Config-Check (verhindert Desync!)
+2. aerospace reload-config     # TOML neu laden
+3. start-borders.sh            # JankyBorders restart (optional)
+4. sketchybar --reload         # Sanfter Reload (KEIN Kill!)
+5. --trigger aerospace_workspace_change
+6. --trigger workspace_force_refresh
+```
+
+**Vorteil vs `restart_services.sh`:**
+- KEIN Force-Kill → Keine Zombie-Prozesse
+- Sanfter Reload → Keine Unterbrechung
+- Automatischer Symlink-Check
+
+**Fallback:** `./scripts/restart_services.sh` (Force-Kill + Zombie-Guards)
+
+### Window-Navigation Patterns
+
+**1. Circular Navigation (Hyper+J/L):**
+```bash
+# focus-circular.sh [left|right]
+# Wrap-around: letztes → erstes, erstes → letztes
+# Nutzt Window-IDs Array, Modulo-Arithmetik: (index + 1) % total
+aerospace list-windows --workspace focused --format %{window-id}
+# → Array, find current, (index ± 1) % length, aerospace focus --window-id
+```
+
+**2. Directional Navigation (Hyper+Pfeile):**
+```bash
+# focus-and-center.sh [up|down|left|right]
+# KEIN Wrap: Stoppt an Grenzen
+# Nutzt aerospace focus [direction]
+aerospace focus up/down/left/right
+./center-mouse.sh  # Mouse-Center
+```
+
+**Wann welches?**
+- **J/L:** Horizontales Cycling (Karussell, wrap-around)
+- **Pfeile:** Directional Grid-Navigation (stoppt an Grenzen)
+
+### Multi-Monitor Workspace-Flow
+
+**Aerospace Workspace-Monitor-Binding:**
+- Workspaces sind NICHT an Monitor gebunden!
+- Workspace kann zwischen Monitoren verschoben werden
+- Jeder Monitor zeigt EINE Workspace gleichzeitig
+
+**Shortcuts:**
+- **Hyper+O:** Workspace → next Monitor verschieben (HAUPTFUNKTION!)
+- **Hyper+U/P:** Focus zwischen Monitoren wechseln (+ mouse center)
+- **Hyper+I:** Window → next Monitor verschieben (Smart mit X/Y/Z)
+- **Hyper++U/P:** Workspace → prev/next Monitor + Sketchybar-Refresh
+
+**Overflow-Workspaces X/Y/Z:**
+- Automatisch erstellt bei Multi-Monitor (wenn Ziel-Monitor leer)
+- Sortierung nach QWERTZ-Order in Sketchybar
+- Script: `move-window-to-monitor.sh` (Smart Assignment)
+
+### Window Rules System
+
+**Pattern-Matching (aerospace.toml [[on-window-detected]]):**
+
+```toml
+# Bundle-ID (präzise):
+[[on-window-detected]]
+if.app-id = 'com.apple.systempreferences'
+run = 'layout floating'
+
+# App-Name Regex:
+[[on-window-detected]]
+if.app-name-regex-substring = 'Finder'
+run = 'layout floating'
+
+# Window-Title Regex:
+[[on-window-detected]]
+if.app-id = 'com.raycast.macos'
+if.window-title-regex-substring = 'Settings'
+run = 'layout floating'
+
+# Auto-Workspace-Assignment:
+[[on-window-detected]]
+if.app-id = 'md.obsidian'
+run = 'move-node-to-workspace Q'
+```
+
+**Get App-ID:** `osascript -e 'id of app "AppName"'` oder `./scripts/get-app-id.sh`
+
+**Vollständige Dokumentation:** `scripts/README.md`
 
 ## Code-Patterns & Best Practices
 
-### Aerospace Commands (anstatt Yabai)
+### Aerospace Commands
 
+**Workspace Navigation:**
 ```bash
-# Workspace Navigation
-aerospace workspace Q           # Zu Workspace wechseln (QWERTZ)
-aerospace list-workspaces       # Alle Workspaces auflisten
-aerospace list-windows          # Windows mit IDs
+aerospace workspace Q                    # Zu QWERTZ-Workspace wechseln
+aerospace list-workspaces --all          # Alle Workspaces (inkl. hidden)
+aerospace list-windows --workspace Q     # Windows in Workspace Q
+```
 
-# Window Management
-aerospace move left/right/up/down              # Fenster bewegen
-aerospace move-node-to-workspace C             # Zu Workspace C
+**Window Management:**
+```bash
+aerospace move left/right/up/down              # Fenster innerhalb Workspace bewegen
+aerospace move-node-to-workspace A             # Zu Workspace A verschieben
 aerospace move-node-to-monitor next            # Zu anderem Monitor
 aerospace focus left/right/up/down             # Fokus ändern
-
-# Layout
-aerospace layout tiles          # Tiles Layout
-aerospace layout accordion      # Accordion Layout
-aerospace layout floating       # Floating Layout
-aerospace balance-sizes         # Fenster-Größen ausgleichen
-
-# Config
-aerospace reload-config         # Config neu laden
 ```
 
-### Sketchybar Integration (Event-basiert)
-
-**2 Handler-Pattern (Production seit 2025-11-12):**
-
-```toml
-# In ~/.aerospace.toml - User Workspace-Wechsel
-exec-on-workspace-change = [
-  '/bin/bash', '-c',
-  'sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
-]
+**Layouts:**
+```bash
+aerospace layout tiles                   # Tiles Layout (nebeneinander)
+aerospace layout accordion               # Accordion Layout (übereinander)
+aerospace layout floating                # Floating Layout
+aerospace balance-sizes                  # Fenster-Größen ausgleichen
 ```
 
+**Config & Debugging:**
+```bash
+aerospace reload-config                  # Config neu laden (TOML)
+aerospace list-monitors                  # Alle Monitore
+aerospace debug-windows                  # Window-Tree Debug
+```
+
+**Wann Script vs Command?**
+- **Aerospace Command:** Einzelne Operation (focus, move, layout)
+- **Script:** Mehrere Steps, Logic, Mouse-Center, Error-Handling
+
+### Sketchybar Event-Architecture
+
+**2-Handler-Pattern (instant updates):**
+
+**Handler 1:** `aerospace_workspace_change` (User wechselt Workspace)
+- Triggered von Aerospace `exec-on-workspace-change` (aerospace.toml:35-38)
+- Komplettes Rebuild: Discovery, Items, Icons
+- Implementation: spaces.lua:304-367
+- Instant execution (keine Delays!)
+
+**Handler 2:** `workspace_force_refresh` (Window open/close/move)
+- Triggered von Sketchybar `window_created`, `window_destroyed`, `routine` (2s)
+- **150ms Delay für Aerospace State-Update!** (spaces.lua:369)
+- Nur Icon-Updates (lightweight, kein Discovery)
+- Implementation: spaces.lua:368-602
+
+**CRITICAL:** Logic in beiden Handlern MUSS identisch sein (App-Icon-Generation!)
+
+**Aerospace Batch Query System:**
 ```lua
--- In Sketchybar Config - 2 separate Handler
+-- aerospace_batch.lua - 4 parallele Queries:
+aerospace_batch:query_with_monitors(function(data)
+  -- 1. list-monitors → Monitor-Topology
+  -- 2. list-workspaces --all → Alle WS mit Monitor-Assignment
+  -- 3. list-workspaces --focused → Aktuell fokussierte WS
+  -- 4. list-windows --all → Alle Fenster mit App-Namen
 
--- 1. aerospace_workspace_change (User wechselt Workspace)
-space_window_observer:subscribe("aerospace_workspace_change", function(env)
-  aerospace_batch:refresh()
-  aerospace_batch:query_with_monitors(function(batch_data)
-    -- Komplettes Rebuild: Workspace-Discovery, Item-Creation, Icons
-  end)
-end)
-
--- 2. workspace_force_refresh (Window-Events)
-space_window_observer:subscribe("window_created", function(env)
-  sbar.trigger("workspace_force_refresh")
-end)
-
-space_window_observer:subscribe("workspace_force_refresh", function(env)
-  aerospace_batch:refresh()
-  sbar.delay(0.15, function()  -- 150ms für AeroSpace State-Update
-    aerospace_batch:query_with_monitors(function(batch_data)
-      -- Nur Icon-Updates (lightweight)
-    end)
-  end)
+  -- Completion-Callback wenn alle 4 fertig
+  -- 1s Cache (vermeidet redundante Queries)
 end)
 ```
 
-**Wichtig:**
-- Logic in beiden Handlern MUSS identisch sein (besonders App-Icon-Generation)
-- 150ms Delay gibt AeroSpace Zeit für State-Update
-- Polling (2s) als Fallback falls Events versagen
+**Dynamic Workspace Discovery & Soft-Delete:**
+```lua
+-- Discovery (spaces.lua:387-473):
+-- QWERTZ/XYZ: Immer erstellt (Q W E R T A S D F G X Y Z)
+-- Numerische WS: Nur wenn Fenster vorhanden
+-- create_workspace_item() on-demand
 
-### Scripts: QWERTZ Workspace-System (Wichtig!)
+-- Soft-Delete (spaces.lua:474-492):
+local should_show = (has_windows or is_focused)
+if not should_show then
+  sbar.set(space_item, { drawing = "off" })  -- Verstecken, nicht löschen!
+end
+-- KEINE Exemption für QWERTZ mehr! (geändert 2025-11-14)
+```
 
-**NIEMALS numerische Workspaces in Scripts verwenden!**
+**App-Icons SF-Symbols Mapping:**
+```lua
+-- app_icons.lua - 300+ App-Mappings:
+local app_icons = {
+  ["Obsidian"] = ":obsidian:",        -- Tropfen
+  ["Code"] = ":code:",                 -- Spirale
+  ["Claude"] = ":claude:",             -- Stern
+  ["Safari"] = ":safari:",             -- Kompass
+  ["Default"] = ":default:",           -- Fragezeichen
+}
+
+-- Integration in spaces.lua:417-530:
+for app, count in pairs(apps) do
+  local icon = app_icons[app] or app_icons["Default"]
+  icon_line = icon_line .. icon
+  if count > 1 then icon_line = icon_line .. count end
+end
+```
+
+**Performance:**
+- 0% CPU idle, ~1% CPU bei Window-Changes
+- Events trigger instant, Polling (2s) nur Fallback
+- 1s Cache für Aerospace-Queries
+
+### Workspace-Naming Convention
+
+**CRITICAL: NIEMALS numerische Workspaces verwenden!**
 
 ```bash
-# ❌ FALSCH - Erstellt numerische Workspace
+# ❌ FALSCH - Erstellt ungewollte numerische Workspace
 aerospace workspace 1
-aerospace move-node-to-workspace 2
 
-# ✅ RICHTIG - Nutzt QWERTZ-System
+# ✅ RICHTIG - QWERTZ-System
 aerospace workspace Q  # Erste Workspace
 aerospace workspace G  # Letzte Haupt-Workspace
-aerospace move-node-to-workspace A  # AI Workspace
 
-# Fallbacks in Scripts:
-# - Bei Empty/Error → workspace Q (erste)
-# - Nach Delete → workspace Q
-# - Prev-Limit → workspace Q
-# - Next-Limit → workspace G
+# Fallbacks in Scripts: Q (erste), G (letzte), X/Y/Z (overflow)
 ```
 
-**Warum wichtig:**
-- Aerospace erstellt jeden explizit genannten Workspace-Namen SOFORT
-- `aerospace workspace 1` → Workspace "1" existiert ab sofort
-- Sketchybar zeigt alle existierenden Workspaces
-- Numerische Namen durchbrechen QWERTZ-System
+**Grund:** Aerospace erstellt jeden Namen SOFORT → `workspace 1` erstellt "1"
 
-### Scripts: Aerospace-native Commands nutzen
+## Kritische Lessons Learned
 
-**67% weniger Scripts durch Aerospace built-ins!**
+### 0. Shortcut-Inkonsistenz (Balance-Shortcut)
 
-NICHT mehr nötig (Aerospace native):
-- ~~window-move-circular~~ → `aerospace move left/right/up/down`
-- ~~fix-space-associations~~ → Virtuelle Workspaces brauchen kein Fix
-- ~~space-explode~~ → Layout-System anders (tiles/accordion)
+**⚠️ ACHTUNG:** Inkonsistenz zwischen Config und Dokumentation gefunden!
 
-BEHALTEN (Aerospace-angepasst):
-- `layout-toggle.sh` - Cycle durch Layouts (20 Zeilen vs 242 bei Yabai!)
-- `balance-toggle.sh` - Nutzt `aerospace balance-sizes`
+- **aerospace.toml:144** → `ctrl-alt-shift-cmd-o = 'balance-sizes'` → **Hyper+ + O** (AKTIV)
+- **SHORTCUTS.md:39** → "Balance | Hyper+ + O | **Hyper+ + B**" → **Hyper+ + B** (FALSCH)
 
-## Kritische Systemverhalten (Lessons Learned)
+**TATSÄCHLICH AKTIV:** **Hyper+ + O** (laut aerospace.toml)
 
-### 0. Config-Desynchronisation (HÄUFIGSTES PROBLEM!)
-**SYMPTOM:** Config-Änderungen wirken nicht, `aerospace reload-config` bringt nichts
-**ROOT CAUSE:** Symlink fehlt! `~/.aerospace.toml` ist normale Datei statt Link
-**IMMER VOR EDIT PRÜFEN:**
+**HINWEIS:** SHORTCUTS.md:39 muss korrigiert werden zu "Hyper+ + O" ODER aerospace.toml:144 muss geändert werden zu `ctrl-alt-shift-cmd-b`. User-Entscheidung erforderlich!
+
+### 1. Config-Desynchronisation (TOP PRIORITY!)
+
+**Symptom:** Config-Änderungen wirken nicht
+**Cause:** Symlink fehlt! `~/.aerospace.toml` ist normale Datei statt Link
+
+**Prevention:**
 ```bash
-ls -la ~/.aerospace.toml
-# MUSS sein: lrwxr-xr-x ... -> .../configs/aerospace.toml
-# Falls -rw-r--r--: Symlink fehlt!
+./scripts/verify-symlinks.sh  # VOR jedem Edit!
 ```
-**FIX:**
+
+**Fix:**
 ```bash
-rm ~/.aerospace.toml
+rm ~/.aerospace.toml ~/.config/sketchybar
 ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/aerospace.toml ~/.aerospace.toml
+ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/sketchybar ~/.config/sketchybar
 ```
-**WARUM:** Nur Sketchybar wurde initial symlinked, Aerospace nur kopiert (siehe README vs CLAUDE.md Widerspruch)
 
-### 1. Window Manager Konflikte
-**NIEMALS Yabai + Aerospace gleichzeitig!**
-- Beide WMs versuchen gleiche Fenster zu managen → Bildfehler/Flimmern
-- **Lösung:** Yabai/SKHD stoppen → Neustart → Aerospace übernimmt clean
+### 2. Sketchybar Zombie-Prozesse
 
-### 2. Sketchybar Lock-File-Problem (HÄUFIGSTE URSACHE!)
-**Symptom:** Workspaces nicht klickbar, keine Highlights, mehrere Lua-Prozesse
-**Ursache:** Mehrfache Restart-Versuche erzeugen Zombie-Prozesse
-**IMMER verwenden:**
+**Symptom:** Workspaces nicht klickbar, mehrere Lua-Prozesse
+**Cause:** Mehrfache Restart-Versuche ohne Sleep
+
+**Solution:**
 ```bash
-killall -9 sketchybar lua 2>/dev/null
-sleep 2
-brew services restart sketchybar
+./scripts/refresh-aerospace-sketchy.sh  # Soft-Reload (EMPFOHLEN)
+# ODER
+./scripts/restart_services.sh           # Force mit Zombie-Guards
 ```
 
-### 3. Displays Separate Spaces (ERFORDERLICH!)
-**Aerospace MUSS haben:** "Displays have separate Spaces" = ON
-- System Settings → Desktop & Dock → Mission Control
-- Nach Toggle: System neu starten (ODER nur Toggle, Aerospace startet)
+**Details:** `docs/TROUBLESHOOTING.md`
 
-### 4. Accessibility nach Updates
-**Nach jedem Aerospace-Update:** Permission OFF/ON togglen
-- System Settings → Privacy & Security → Accessibility → Aerospace
+### 3. Aerospace-Spezifika
 
-### 5. Sketchybar Space-Type Fehler
-**FALSCH:** `sbar.add("space", "space.1", { space = 1 })` - Bindet an macOS Space
-**RICHTIG:** `sbar.add("item", "space.1", {})` - Normale Items
-**Grund:** Aerospace virtuelle Workspaces ≠ macOS Spaces
+**Virtual Workspaces ≠ macOS Spaces:**
+- Alle Fenster in EINEM macOS Space
+- Sketchybar Items als `"item"` Type (NICHT `"space"`!)
+- "Displays have separate Spaces" MUSS ON sein
 
-## Git Workflow
+**Nach Aerospace-Update:**
+- Accessibility Permission OFF/ON togglen
 
-**Branch-Struktur:**
-- `main` - Production-ready Code
-- Feature-Branches für größere Änderungen
+**Window Manager Konflikte:**
+- NIEMALS Yabai + Aerospace gleichzeitig
+- Clean Start: Yabai stoppen → Reboot → Aerospace
 
-**Wichtige Tags:**
-- `v-yabai-final` - Letzter Yabai-Stand vor Migration (in ~/MyCloud/TOOLs/yabai-skhd-sbar)
-- Aktuelle Commits in diesem Branch dokumentieren Aerospace-Setup
+### 4. Event-Driven Architecture
 
-**Änderungen committen (NUR wenn User explizit fragt!):**
-```bash
-git status
-git add [spezifische Dateien]
-git commit -m "Kurze Beschreibung"
-# ⚠️ NIEMALS pushen ohne explizite Anweisung!
-```
+**App-Icons Instant-Update:**
+- 2 Handler: `aerospace_workspace_change` + `workspace_force_refresh`
+- 150ms Delay für Aerospace State-Update
+- Logic in beiden MUSS identisch sein!
 
-## Rollback-Strategie
+**Performance:**
+- Events trigger instant, Polling (2s) nur Fallback
+- 0% CPU idle, ~1% bei Window-Changes
 
-**⚠️ HINWEIS:** Rollback aktuell archiviert (scripts/rollback-to-yabai.sh existiert im Repo, aber Yabai nicht mehr installiert)
+## Git & Rollback
 
-Falls Aerospace komplett ausfällt:
-1. Basis-Projekt wiederherstellen: `cd ~/MyCloud/TOOLs/yabai-skhd-sbar && git checkout v-yabai-final`
-2. Yabai/SKHD reinstallieren: `brew install koekeishiya/formulae/yabai koekeishiya/formulae/skhd`
-3. Configs symlinken und Services starten
+**Tags:**
+- `v-yabai-final` - Letzter Yabai-Stand (in ~/MyCloud/TOOLs/yabai-skhd-sbar)
 
-## Projekt-Dokumentation
+**⚠️ NIEMALS pushen ohne User-Anweisung!**
 
-**Vollständige Dokumentation:**
-- `README.md` - Setup-Anleitung, Installation, Rollback
-- `docs/PLAN.md` - Migrations-Plan Phase 0-8 (Phase 5 abgeschlossen ✅)
-- `SHORTCUTS.md` - Transition Cheat Sheet (Yabai→Aerospace Mapping)
-- `scripts/README.md` - Scripts-Übersicht und Testing
-- `docs/TROUBLESHOOTING.md` - **WICHTIGSTE RESOURCE** für Problemlösungen (Lock-File, Zombie-Prozesse, etc.)
-- `docs/ZOMBIE-FIX.md` - Detaillierte Sketchybar Restart-Problematik
-- `docs/APP-ICONS-FIX.md` - App-Icons Instant-Update Implementation
-- `scripts/ToDos.md` - Aktuell leer, bereit für neue Tasks
+**Rollback-Script:** `scripts/rollback-to-yabai.sh` (archiviert, Yabai nicht mehr installiert)
 
-**Aerospace Docs:** https://nikitabobko.github.io/AeroSpace/guide
-**Sketchybar Docs:** https://felixkratz.github.io/SketchyBar/
-**Basis-Projekt:** ~/MyCloud/TOOLs/yabai-skhd-sbar (v2.7.2, Tag: v-yabai-final)
+## Dokumentation & Ressourcen
 
-## Wichtigste Erkenntnisse (für zukünftige Claude-Instanzen)
+**Projekt-Docs:**
+- `README.md` - Setup, Installation, Troubleshooting Quick-Ref
+- `docs/TROUBLESHOOTING.md` - **WICHTIGSTE RESOURCE** für Problemlösungen
+- `docs/PLAN.md` - Migrations-Plan (in scripts/ToDos.md verschoben)
+- `SHORTCUTS.md` - Yabai→Aerospace Transition Cheat Sheet
+- `scripts/README.md` - Scripts-Übersicht
 
-**🎯 TOP PRIORITY CHECKS:**
+**Externe Docs:**
+- **Aerospace:** https://nikitabobko.github.io/AeroSpace/guide
+- **Sketchybar:** https://felixkratz.github.io/SketchyBar/
 
-```bash
-# VOR JEDER CONFIG-ÄNDERUNG:
-./scripts/verify-symlinks.sh  # MUSS ✅ sein!
+## Migration Status
 
-# VOR JEDER SKETCHYBAR-ÄNDERUNG:
-ps aux | grep -E '[s]ketchybar' | wc -l  # MUSS 2 sein!
+**Status:** ✅ ABGESCHLOSSEN - Production-ready seit 2025-11-12
+**Aerospace >> Yabai Performance** (User: "unglaublich performant")
+**Scripts-Reduktion:** 18 → 6 Core Scripts (67% weniger!)
+**Aktuelle TODOs:** Siehe `scripts/ToDos.md`
 
-# NACH CONFIG-ÄNDERUNGEN (Soft-Reload):
-./scripts/refresh-aerospace-sketchy.sh
-```
+## Known Issues & Maintenance
 
-### Kritische Lessons Learned
+**Aerospace Quirks:**
+- Versteckte Fenster rendern weiter → Battery-Drain (Design-Decision)
+- Mission Control zeigt nur 1 Space (virtuelle Workspaces)
+- "Displays have separate Spaces" MUSS ON sein
+- **Aerospace-Befehle versionsabhängig:**
+  - **v0.19.x und früher:** `aerospace enable on/off/toggle` (AKTUELL v0.19.2-Beta)
+  - **v0.20 und später:** `aerospace managed on/off/toggle`
+  - **Bei Upgrade auf v0.20+:** `apple_click_handler.sh` anpassen (`enable` → `managed`)
 
-1. **Config-Desynchronisation vermeiden (TOP PRIORITY!):**
-   - `~/.aerospace.toml` MUSS Symlink sein → `./scripts/verify-symlinks.sh`
-   - `~/.config/sketchybar` MUSS Symlink sein
-   - **Häufigster Fehler:** Edit wirkt nicht weil kein Symlink!
-   - **Fix:** Script zeigt automatisch Fix-Commands
-
-2. **Aerospace ≠ Yabai Space-Model:**
-   - Virtuelle Workspaces (NICHT Mission Control Spaces)
-   - Sketchybar Items als `"item"` Type, NICHT `"space"` Type
-   - Alle Fenster in EINEM macOS Space (meist Space 1)
-   - Mission Control zeigt nur 1 Space
-
-3. **Sketchybar Lua Zombies (✅ GELÖST 2025-11-12):**
-   - **War Problem:** Lua workers überleben Restart → Lock-File gesperrt
-   - **Lösung:** Robuste `restart_services.sh` + `refresh-aerospace-sketchy.sh`
-   - **Jetzt:** Apple-Logo Doppelklick = zuverlässiger Soft-Reload
-   - **Fallback:** `./scripts/restart_services.sh` mit Auto-Guards
-
-4. **App-Icons Update Delay (✅ GELÖST 2025-11-12):**
-   - **Problem:** Icons erschienen erst nach manuellem Workspace-Wechsel
-   - **Root Cause:** `workspace_force_refresh` Event hatte keinen Handler
-   - **Lösung:**
-     - Handler für `workspace_force_refresh` mit 150ms AeroSpace-Delay
-     - Events: `window_created`, `window_destroyed`, `routine` (2s polling)
-     - Logic identisch zu `aerospace_workspace_change` (wichtig!)
-   - **Jetzt:** Icons erscheinen instant bei Window-Changes (~150-300ms)
-
-5. **Event-driven Architecture:**
-   - 2 separate Handler: `aerospace_workspace_change` (User-WS-Wechsel) + `workspace_force_refresh` (Window-Events)
-   - Events trigger instant, Polling (2s) nur Fallback
-   - Performance: 0% CPU idle, ~1% bei Window-Changes
-
-6. **Scripts-Reduktion 67%:**
-   - Aerospace built-ins ersetzen viele Custom-Scripts
-   - Balance-Toggle: 242 Zeilen → 20 Zeilen
-   - Window-Movement: 3 Scripts → `aerospace move`
-   - Insgesamt: 18 Scripts → 6 Core-Scripts
-
-7. **Window Manager Konflikte:**
-   - NIEMALS Yabai + Aerospace gleichzeitig!
-   - Clean Start: Yabai/SKHD stoppen → Reboot → Aerospace
-
-8. **Displays Separate Spaces:**
-   - Aerospace benötigt "Displays have separate Spaces" = ON
-   - Nach Toggle: Neustart (oder nur Toggle, Aerospace startet)
-
-9. **Accessibility nach Updates:**
-   - Nach jedem Aerospace-Update: Permission OFF/ON togglen
-   - System Settings → Privacy & Security → Accessibility
-
-10. **Numerische Workspace Prevention (✅ GELÖST 2025-11-12):**
-   - **Problem:** Scripts erstellten unabsichtlich numerische Workspaces (1, 2, 3...)
-   - **Root Cause:** `delete-current-workspace.sh` nutzte `aerospace workspace 1` als Fallback
-   - **Lösung:** Alle Fallbacks auf QWERTZ umgestellt (Q = erste Workspace)
-   - **Jetzt:** Nur QWERTZ (Q W E R T A S D F G) + Overflow (X Y Z) möglich
-   - **Regel:** NIEMALS numerische Workspaces in Scripts/Configs verwenden!
-
-11. **Yabai-Residuen komplett entfernt (✅ GELÖST 2025-11-12 Abend):**
-   - **Problem:** 5 versteckte Yabai-Abhängigkeiten im Code
-   - **Root Causes:**
-     - `workspace_force_refresh` Event nicht registriert
-     - `claude_notifier.lua` nutzte `yabai -m query`
-     - `myping_toggle.lua` Pfad zu altem yabai-skhd-sbar Projekt
-     - `center-mouse.sh` nutzte nicht-existente Aerospace window-x/y Variablen
-     - `sketchybar-reset.sh` pingte Yabai socket
-   - **Lösung:**
-     - Event in `init.lua` registriert (Zeile 13)
-     - Claude-Notifier nutzt `aerospace list-windows --focused`
-     - MyPing-Path auf `aerospace+sketchy` aktualisiert
-     - center-mouse.sh neu geschrieben mit JXA (JavaScript for Automation)
-     - sketchybar-reset.sh nutzt Aerospace-Events
-   - **Jetzt:** 100% Aerospace-native, keine Yabai-Calls mehr
-
-12. **App-Auto-Assignment aktiviert (✅ 2025-11-12 Abend):**
-   - **Problem:** Alle `[[on-window-detected]]` Rules auskommentiert, veraltete Workspace-Namen (C/M/B)
-   - **Lösung:** 26 Apps auf QWERTZ-Schema gemappt (Q/W/E/R/T/A/S/D/F/G)
-   - **Mapping:** VS Code→A, Safari→S, Spotify→G, Mail→E, Terminal→T, Obsidian→Q, Finder→F, etc.
-   - **Jetzt:** Neue App-Fenster landen automatisch in richtigen Workspaces
-
-13. **Mouse-Follows-Focus implementiert (✅ 2025-11-12 Abend):**
-   - **Problem:** center-mouse.sh nutzte nicht-existente `%{window-x}` Aerospace-Variablen
-   - **Root Cause:** Aerospace bietet KEINE Window-Geometrie-Variablen
-   - **Lösung:** JXA (JavaScript for Automation) für System Events Window-Position
-   - **Funktioniert mit:** cliclick (primary) oder Swift/CoreGraphics (fallback)
-   - **Jetzt:** Alle Focus-Änderungen zentrieren Maus (Hyper+Arrows, Hyper+J/L, Hyper+N/M, Workspace-Wechsel)
-
-14. **Keybinding-Optimierung (✅ 2025-11-12 Abend):**
-   - **Geswappt:** J/L ↔ N/M für bessere Ergonomie
-   - **Neu:** N/M = Workspace Navigation (häufiger), J/L = Window Focus (seltener)
-   - **Hinzugefügt:** Hyper+CMD+J/L für Window Swap (war vergessen)
-   - **Circular Navigation:** Hyper+J/L haben wrap-around (letztes→erstes Fenster)
-
-15. **Circular Window Navigation aktiviert (✅ 2025-11-14):**
-   - **Problem:** Hyper+J/L stoppten am Rand (dfs-prev/next mit --boundaries-action stop)
-   - **User-Request:** Karussell-Modus (rechts wraps zu links, links wraps zu rechts)
-   - **Lösung:**
-     - Rebind auf `focus-circular.sh` (nutzt Modulo für Wrap-Around)
-     - Bash 3.2 Fix: `mapfile` → `while read` Loop (macOS Kompatibilität)
-     - Richtungen korrigiert: J=right, L=left
-   - **Jetzt:** Hyper+J/L wrappen circular durch alle Fenster im Workspace
-
-**Performance:** Aerospace >> Yabai (User: "unglaublich performant")
-**Status:** Production-ready seit Phase 5 (2025-11-11)
-**Stability:** Zombie-Fix seit 2025-11-12 Morgen → Soft-Reload funktioniert zuverlässig
-**Completeness:** Yabai-frei seit 2025-11-12 Abend → 100% Aerospace-native 🎯
-**App-Icons:** Instant-Update seit 2025-11-12 Morgen → Window-Events triggern sofort (150-300ms)
-**Ergonomics:** Keybindings optimiert 2025-11-12 Abend → N/M=Workspaces, J/L=Windows
-
-## Known Issues & Quirks
-
-**Aerospace-spezifisch:**
-- Versteckte Fenster rendern weiter → leicht erhöhter Battery-Drain (Aerospace Design-Decision)
-- Virtuelle Workspaces ≠ macOS Spaces → Mission Control zeigt nur 1 Space
-- Cmd+Tab funktioniert normal, Cmd+` (per-app cycling) funktioniert normal
-- Bei Multi-Monitor-Setup: "Displays have separate Spaces" MUSS ON sein
-
-**Sketchybar Integration:**
-- Bei Config-Änderungen: **IMMER** Soft-Reload nutzen (Apple-Logo Doppelklick oder `refresh-aerospace-sketchy.sh`)
-- Bei Zombie-Prozessen: `ps aux | grep -E '[s]ketchybar' | wc -l` sollte 2 sein (nicht 4+)
-- Lock-File-Problem tritt nur bei mehrfachen harten Restarts auf → Siehe docs/TROUBLESHOOTING.md
+**Sketchybar:**
+- Config-Änderungen: Soft-Reload nutzen (`refresh-aerospace-sketchy.sh`)
+- Zombie-Check: `ps aux | grep -E '[s]ketchybar' | wc -l` sollte 2 sein
 
 **Maintenance:**
 - Nach Aerospace-Updates: Accessibility Permission OFF/ON togglen
-- Config-Änderungen in `configs/` werden sofort wirksam (Symlinks!)
-- **NIEMALS** Configs in `~/` direkt editieren (werden überschrieben bei reload)
+- **NIEMALS** Configs in `~/` direkt editieren (nur via Symlinks in `configs/`!)
