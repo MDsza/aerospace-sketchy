@@ -295,13 +295,16 @@ const centerY = pos[1] + size[1] / 2;
 - Weiß (`0xffffffff`) = Aktiv (Window-Management läuft)
 - Dunkelgrau (`0xff6e6e6e`) = Pausiert (Window-Management gestoppt)
 
-**⚠️ WICHTIG - Aerospace-Befehl (versionsabhängig):**
+**⚠️ WICHTIG - Aerospace-Befehl (versionsabhängig, geprüft 2025-11-15):**
 ```bash
 # Aerospace ≤ 0.19.x (AKTUELL v0.19.2-Beta):
 aerospace enable on/off
 
 # Aerospace ≥ 0.20 (bei Upgrade umstellen!):
 aerospace managed on/off
+
+# Script mit TODO-Kommentaren vorbereitet:
+# configs/sketchybar/plugins/apple_click_handler.sh
 ```
 
 **Flow beim Pausieren:**

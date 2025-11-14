@@ -8,6 +8,7 @@ STATE_FILE="/tmp/aerospace-paused-state"
 # Wenn State-File existiert → AeroSpace läuft NICHT → reaktivieren
 if [ -f "$STATE_FILE" ]; then
     # Reaktivieren
+    # TODO Aerospace v0.20+: 'enable' → 'managed' (Breaking Change!)
     aerospace enable on
     sleep 0.3
 
@@ -32,6 +33,7 @@ if [ -f "$STATE_FILE" ]; then
     sketchybar --set apple icon.color=0xffffffff
 else
     # Pausieren
+    # TODO Aerospace v0.20+: 'enable' → 'managed' (Breaking Change!)
     aerospace enable off
 
     # Borders stoppen

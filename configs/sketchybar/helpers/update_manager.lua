@@ -93,7 +93,7 @@ end
 function update_manager:collect_system_info(callback)
   -- Expanded system info collection
   local batch_cmd = [[
-    CPU_LOAD=$(top -l 1 -n 0 | grep 'CPU usage' | awk '{gsub(/%/, "", $3); print $3}' 2>/dev/null || echo '0')
+    CPU_LOAD=$(top -l 1 -n 0 | grep 'CPU usage' | awk '{gsub(/%/, "", $3); gsub(/%/, "", $5); user=$3; sys=$5; print user+sys}' 2>/dev/null || echo '0')
     MEMORY_USAGE=$(vm_stat | awk '/Pages active/ {active=$3} /Pages free/ {free=$3} END {gsub(/\./,"",active); gsub(/\./,"",free); total=active+free; if(total>0) print int((active/total)*100); else print 0}' 2>/dev/null || echo '0')
     DISK_USAGE=$(df -h / | awk 'NR==2 {gsub(/%/,"",$5); print $5}' 2>/dev/null || echo '0')
     

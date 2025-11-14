@@ -79,7 +79,7 @@ local function update_cpu(system_info)
   
   if not load then
     -- Fallback to direct CPU query if batch info not available
-    sbar.exec("/usr/bin/top -l 1 -n 0 | /usr/bin/grep 'CPU usage' | /usr/bin/awk '{gsub(/%/, \"\", $3); print $3}'", function(result)
+    sbar.exec("/usr/bin/top -l 1 -n 0 | /usr/bin/grep 'CPU usage' | /usr/bin/awk '{gsub(/%/, \"\", $3); gsub(/%/, \"\", $5); user=$3; sys=$5; print user+sys}'", function(result)
       load = tonumber(result) or 0
       if load > 0 then
         update_cpu_display(load)

@@ -176,13 +176,13 @@ else
 fi
 
 # ============================================================================
-# HEALTH-CHECK: Workspaces geladen (sollte ≥14 sein: 1-9,E,T,C,B,M)
+# HEALTH-CHECK: Workspaces geladen (sollte ≥13 sein: Q,W,E,R,T,A,S,D,F,G,X,Y,Z)
 # ============================================================================
 WORKSPACES=$(sketchybar --query bar 2>/dev/null | grep "space\." | wc -l | tr -d ' ')
 echo "Workspaces loaded: $WORKSPACES"
 
-if [ -z "$WORKSPACES" ] || [ "$WORKSPACES" -lt 14 ]; then
-  echo "⚠️  WARNING: Only $WORKSPACES workspaces loaded (expected: 14+)"
+if [ -z "$WORKSPACES" ] || [ "$WORKSPACES" -lt 13 ]; then
+  echo "⚠️  WARNING: Only $WORKSPACES workspaces loaded (expected: 13+)"
   osascript -e "display notification \"Nur $WORKSPACES Workspaces geladen. Bitte prüfen!\" with title \"Restart Check\"" &
 fi
 
