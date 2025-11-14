@@ -157,11 +157,16 @@ ls -la /tmp/sketchybar*.lock 2>/dev/null # Lock-Files prüfen
 │  ├─ spaces.lua (655 Zeilen!) → Workspaces, 2 Event-Handler
 │  ├─ menus.lua → Dropdown-Menüs
 │  └─ widgets/
-│     ├─ init.lua
-│     ├─ claude_notifier.lua
-│     ├─ myping_toggle.lua
-│     ├─ cpu.lua, memory.lua, battery.lua, ...
-│     └─ front_app.lua
+│     ├─ init.lua (11 Zeilen)
+│     ├─ claude_notifier.lua (102 Zeilen)
+│     ├─ myping_toggle.lua (95 Zeilen)
+│     ├─ cpu.lua (310 Zeilen)
+│     ├─ memory.lua (341 Zeilen)
+│     ├─ battery.lua (228 Zeilen)
+│     ├─ volume.lua (308 Zeilen)
+│     ├─ network.lua (415 Zeilen)
+│     ├─ disk.lua (382 Zeilen)
+│     └─ system_status.lua (251 Zeilen)
 │
 └─ helpers/
    ├─ aerospace_batch.lua → Query-Optimierung (4 parallele Queries, 1s Cache)
@@ -170,6 +175,16 @@ ls -la /tmp/sketchybar*.lock 2>/dev/null # Lock-Files prüfen
    ├─ update_manager.lua → Centralized Updates
    └─ default_font.lua → Font-Definitionen
 ```
+
+**Module-Statistik (~3700 Zeilen total):**
+
+**Core** (7 Files, 303 Zeilen): init.lua (35), bar.lua (21), bar_config.lua (24), colors.lua (30), settings.lua (26), default.lua (54), icons.lua (113)
+
+**Helpers** (6 Files, 868 Zeilen): aerospace_batch.lua (201), update_manager.lua (275), app_icons.lua (313), json.lua (62), default_font.lua (13), init.lua (4)
+
+**Items** (7 Files, 974 Zeilen): spaces.lua (709 ⭐⭐⭐), media.lua (118), menus.lua (72), apple.lua (47), notch.lua (15), init.lua (13)
+
+**Widgets** (10 Files, 2443 Zeilen): network.lua (415), disk.lua (382), memory.lua (341), cpu.lua (310), volume.lua (308), system_status.lua (251), battery.lua (228), claude_notifier.lua (102), myping_toggle.lua (95), init.lua (11)
 
 ### Monitor-basierte Workspace-Gruppierung (Feature seit 2025-11-14)
 
@@ -280,6 +295,67 @@ const centerY = pos[1] + size[1] / 2;
 - Monitor-Wechsel: `focus-monitor-and-center.sh` (Hyper+U/P)
 
 **Fallback:** Falls JXA fehlschlägt → Swift CGWarpMouseCursorPosition
+
+### Widget-System (Sketchybar)
+
+**Location:** `configs/sketchybar/items/widgets/` (10 Widgets, 2443 Zeilen)
+
+**Übersicht:**
+
+1. **claude_notifier.lua** (102 Zeilen)
+   - Zeigt Claude Code Status in Sketchybar
+   - Trigger: `claude_waiting_status` Event
+   - Icon: ⚡ (aktiv) / 💤 (idle)
+   - Script: `scripts/claude-notify-hook.sh`
+
+2. **myping_toggle.lua** (95 Zeilen)
+   - Toggle für MyPing Skill (On/Off)
+   - Script: `scripts/toggle-myping-skill.sh`
+   - State-File: `/tmp/myping-skill-active`
+
+3. **cpu.lua** (310 Zeilen)
+   - CPU-Auslastung (user + system %)
+   - Polling: 2s via update_manager
+   - Fallback: Direct `top` Query
+   - **Fix 2025-11-15:** Jetzt user+sys statt nur user
+
+4. **memory.lua** (341 Zeilen)
+   - RAM-Auslastung via `vm_stat`
+   - Berechnung: active/(active+free)*100
+   - Farb-Gradient: grün → gelb → rot
+
+5. **battery.lua** (228 Zeilen)
+   - Batterie-Status (% + Charging)
+   - Icon wechselt je nach Level
+   - Warnung bei <20%
+
+6. **volume.lua** (308 Zeilen)
+   - System-Volume Control
+   - Click: Mute Toggle
+   - Scroll: Volume ±5%
+
+7. **network.lua** (415 Zeilen)
+   - Netzwerk-Status (WiFi/Ethernet)
+   - Upload/Download Raten
+   - Connection-Quality Indicator
+
+8. **disk.lua** (382 Zeilen)
+   - Disk-Usage (/ Partition)
+   - `df -h` Parsing
+   - Warnung bei >90%
+
+9. **system_status.lua** (251 Zeilen)
+   - Kombinierter System-Überblick
+   - CPU + Memory + Disk in einem Item
+
+10. **init.lua** (11 Zeilen)
+    - Widget-Loader
+    - Lädt alle Widgets via `require()`
+
+**Integration:**
+- Zentrale Updates via `update_manager.lua` (batch_cmd)
+- Polling alle 2s (configurable)
+- Event-basierte Updates für Claude/MyPing
 
 ### Apple-Logo Klick (Pause/Resume Toggle)
 
