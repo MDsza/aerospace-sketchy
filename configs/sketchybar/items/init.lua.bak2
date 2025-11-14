@@ -1,9 +1,0 @@
-require("items.apple")
--- removed by Codex: require("items.spaces_nav")
-require("items.menus")
-require("items.notch")           -- Platz für die Notch in der Mitte
-require("items.calendar")        -- Uhr ganz rechts
-require("items.widgets")         -- Rechts daneben: CPU/WiFi/Volume/Battery
-require("items.spaces_paged")    -- Danach: rechte Space-Gruppe (links von Uhr/Widgets)
-require("items.front_app")
-require("items.media")

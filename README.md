@@ -6,7 +6,7 @@ Migration von Yabai+SKHD zu Aerospace mit beibehaltener Sketchybar-Integration.
 
 **Aktuell:** Phase 0 - Vorbereitung & Dokumentation
 
-**Migrations-Fortschritt:** Siehe [PLAN.md](PLAN.md)
+**Migration:** ✅ Abgeschlossen (2025-11-12) - Migrations-Plan: [docs/archive/PLAN.md](docs/archive/PLAN.md)
 
 ## Projekt-Übersicht
 
@@ -150,7 +150,7 @@ Hyper + J / L                  → Vorheriges / nächstes Fenster (Karussell, wr
 Hyper+ + N / M                 → Fenster in vorherigen/nächsten Workspace verschieben (mit Follow)
 Hyper + Pfeile                 → Fokus hoch/runter
 Hyper+ + Pfeile                → Fenster tauschen hoch/runter
-Hyper + H / V / K             → Tiles horizontal / Tiles vertical / Accordion (toggle mit letztem Tiles-Zustand)
+Hyper + B / Comma             → Tiles H↔V Toggle / Accordion (toggle mit letztem Tiles-Zustand)
 ```
 
 ### Sketchybar Workspace-Leiste (Final)
@@ -180,32 +180,13 @@ Hyper + H / V / K             → Tiles horizontal / Tiles vertical / Accordion 
 - Weiter-Rendering im Hintergrund (Battery!)
 - Kein Shadow-Toggle
 
-## Rollback
+## Migration Complete
 
-### Soft-Rollback (empfohlen erste 2 Wochen)
+**Status:** ✅ Production-ready seit 2025-11-12
 
-```bash
-./scripts/rollback-to-yabai.sh
-```
+Migration von Yabai → Aerospace erfolgreich abgeschlossen. System läuft stabil, Rollback nicht mehr nötig.
 
-**Effekt:**
-- Aerospace deaktiviert (Binaries bleiben)
-- Yabai+SKHD services restart
-- Configs restored
-
-### Hard-Rollback
-
-Falls Aerospace komplett unbrauchbar:
-
-```bash
-# Im Basis-Projekt
-cd ~/MyCloud/TOOLs/yabai-skhd-sbar
-git checkout v-yabai-final
-./scripts/restore-configs.sh
-
-# Homebrew-State
-brew bundle install --file=backup/Brewfile.backup
-```
+**Basis-Projekt Backup:** `~/MyCloud/TOOLs/yabai-skhd-sbar` (Tag: `v-yabai-final`)
 
 ## Projekt-Struktur
 
@@ -213,7 +194,7 @@ brew bundle install --file=backup/Brewfile.backup
 aerospace+sketchy/
 ├── CLAUDE.md              # Kontext für Claude Code
 ├── README.md              # Diese Datei
-├── PLAN.md                # Migrations-Plan (wird aktualisiert!)
+├── docs/archive/PLAN.md   # Migrations-Plan (abgeschlossen)
 ├── SHORTCUTS.md           # Transition Cheat Sheet
 ├── configs/
 │   ├── aerospace.toml     # Aerospace-Config
@@ -332,4 +313,4 @@ Private Setup-Dokumentation, nicht für öffentliche Distribution.
 
 Bei Fragen zum Basis-Projekt oder Migration siehe:
 - Basis-Projekt README: `~/MyCloud/TOOLs/yabai-skhd-sbar/README.md`
-- Migrations-Plan: [PLAN.md](PLAN.md)
+- Migrations-Plan: [docs/archive/PLAN.md](docs/archive/PLAN.md) (abgeschlossen 2025-11-12)

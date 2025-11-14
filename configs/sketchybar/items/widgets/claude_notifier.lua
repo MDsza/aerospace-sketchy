@@ -37,11 +37,11 @@ local FLAG_FILE = "/tmp/claude-waiting-flag"
 -- Polling function via routine subscription
 claude_notifier:subscribe("routine", function()
   -- Single shell command that checks BOTH flag file AND focused app
-  -- Performance optimized: Yabai query only runs when notification is active
+  -- Performance optimized: Aerospace query only runs when notification is active
   -- Returns: "waiting", "ready", "dismiss", or "missing"
   local check_cmd = 'FLAG_STATE=$([ -f ' .. FLAG_FILE .. ' ] && cat ' .. FLAG_FILE .. ' || echo "missing"); '
     .. 'if [ "$FLAG_STATE" = "waiting" ] || [ "$FLAG_STATE" = "ready" ]; then '
-    .. '  FOCUSED_APP=$(yabai -m query --windows --window 2>/dev/null | jq -r ".app // \\"unknown\\"" 2>/dev/null); '
+    .. '  FOCUSED_APP=$(aerospace list-windows --focused --format "%{app-name}" 2>/dev/null || echo "unknown"); '
     .. '  if [ "$FOCUSED_APP" = "Code" ]; then '
     .. '    rm -f ' .. FLAG_FILE .. '; '
     .. '    echo "dismiss"; '

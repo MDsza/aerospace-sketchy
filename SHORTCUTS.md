@@ -35,14 +35,14 @@ Yabai+SKHD → Aerospace Migration
 |----------|------------|-----------|--------|
 | Fullscreen | Hyper + Return | Hyper + Return | ✅ GLEICH |
 | Float Toggle | Hyper+ + Return | Hyper+ + Return | ✅ GLEICH |
-| Layout Toggle | Hyper + K | **Hyper + K** | ⚠️ GEÄNDERT |
+| Layout Toggle | Hyper + K | **Hyper + Comma** | ⚠️ GEÄNDERT |
 | Balance | Hyper+ + O | **Hyper+ + B** | ⚠️ GEÄNDERT |
 | Rotation Horizontal | Hyper + . | Hyper + . | ✅ GLEICH |
 | Rotation Vertical | Hyper + , | Hyper + , | ✅ GLEICH |
 
-**⚠️ Hyper+K - Layout Toggle:**
-- **Yabai:** BSP ↔ Stack
-- **Aerospace:** tiles ↔ accordion
+**⚠️ Hyper+Comma - Layout Toggle:**
+- **Yabai:** BSP ↔ Stack (war auf K)
+- **Aerospace:** tiles ↔ accordion (von K auf Comma verschoben)
   - **tiles:** Fenster nebeneinander (BSP-ähnlich)
   - **accordion:** Fenster übereinander (Stack-ähnlich)
 
@@ -218,7 +218,7 @@ outer.bottom = 35  # Sketchybar (30) + Border (5)
 - **Overflow-Workspaces** (X Y Z für Multi-Monitor)
 - **Smart Window-to-Monitor** (Hyper+I mit App-Assignment)
 - **Workspace-to-Monitor** (Hyper+O - Hauptfunktion!)
-- **Layout Toggle tiles↔accordion** (Hyper+K)
+- **Layout Toggle tiles↔accordion** (Hyper+Comma)
 - **Monitor-Fokus** (Hyper+U/P)
 - **Apple-Logo Doppelklick** (Kompletter Reload)
 
@@ -262,7 +262,7 @@ Hyper+ + J / L      Zu Prev/Next + Follow
 ```
 Hyper + Return      Fullscreen
 Hyper+ + Return     Float Toggle
-Hyper + K           Layout Toggle (tiles ↔ accordion)
+Hyper + Comma       Layout Toggle (tiles ↔ accordion)
 Hyper + . / ,       Rotation Horizontal / Vertical
 Hyper+ + B          Balance Sizes
 ```
@@ -329,8 +329,8 @@ Z - Monitor 3+ Overflow
 - Overflow-Workspaces X/Y/Z verstehen
 
 ### Woche 3: Layout-System
-- **Hyper+H/V** bewusst einsetzen (Tiles horizontal/vertical)
-- **Hyper+K** toggelt Accordion ↔ letzter Tiles-Zustand
+- **Hyper+B** bewusst einsetzen (Tiles Horizontal ↔ Vertical Toggle)
+- **Hyper+Comma** toggelt Accordion ↔ letzter Tiles-Zustand
 - Floating bleibt separat auf Hyper+⌘+Enter
 
 ---

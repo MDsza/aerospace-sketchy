@@ -27,6 +27,7 @@ vim configs/sketchybar/init.lua
 ps aux | grep -E '[s]ketchybar' | wc -l  # Sollte 2 sein
 aerospace list-workspaces --all          # Q W E R T A S D F G
 sketchybar --query bar | head -20        # Prüfe Items
+ls -la /tmp/sketchybar*.lock 2>/dev/null # Lock-Files prüfen
 ```
 
 **Vollständige Diagnostics:** `docs/TROUBLESHOOTING.md`
@@ -235,9 +236,8 @@ NIEMALS numerische Workspaces (1,2,3...) verwenden! Aerospace erstellt jeden Nam
 
 ### Layouts & Windows
 ```bash
-./scripts/layout-tiles-horizontal.sh    # Hyper + H
-./scripts/layout-tiles-vertical.sh      # Hyper + V
-./scripts/layout-accordion-toggle.sh    # Hyper + K
+./scripts/layout-toggle.sh              # Hyper + B (Tiles Horizontal ↔ Vertical)
+./scripts/layout-accordion-toggle.sh    # Hyper + Comma
 ./scripts/balance-toggle.sh             # Hyper+ + B
 ./scripts/focus-circular.sh             # Hyper + J/L (wrap-around)
 ./scripts/center-mouse.sh               # Mouse-Follows-Focus (JXA)
@@ -324,9 +324,7 @@ aerospace managed on/off
 
 **Sync nach Sketchybar-Restart:** apple.lua prüft State-File bei `aerospace_workspace_change` Event und setzt Icon-Farbe entsprechend.
 
-### Apple-Logo Doppelklick (Soft-Refresh) - VERALTET
-
-**HINWEIS:** Doppelklick-Funktion wurde durch Single-Klick-Toggle ersetzt!
+### Apple-Logo Doppelklick (Soft-Refresh)
 
 **Trigger:** Doppelklick auf Apple-Logo (Sketchybar) - **NICHT MEHR AKTIV**
 
@@ -550,16 +548,22 @@ aerospace workspace G  # Letzte Haupt-Workspace
 
 ## Kritische Lessons Learned
 
-### 0. Shortcut-Inkonsistenz (Balance-Shortcut)
+### 0. Sketchybar Lock-File Issues
 
-**⚠️ ACHTUNG:** Inkonsistenz zwischen Config und Dokumentation gefunden!
+**Symptom:** `sketchybar: could not acquire lock-file... already running?`
 
-- **aerospace.toml:144** → `ctrl-alt-shift-cmd-o = 'balance-sizes'` → **Hyper+ + O** (AKTIV)
-- **SHORTCUTS.md:39** → "Balance | Hyper+ + O | **Hyper+ + B**" → **Hyper+ + B** (FALSCH)
+**Ursache:** Zombie Sketchybar-Prozess oder Lock-File bleibt nach Crash
 
-**TATSÄCHLICH AKTIV:** **Hyper+ + O** (laut aerospace.toml)
+**Schnelle Lösung:**
+```bash
+killall sketchybar
+rm -f /tmp/sketchybar_*.lock 2>/dev/null
+sketchybar
+```
 
-**HINWEIS:** SHORTCUTS.md:39 muss korrigiert werden zu "Hyper+ + O" ODER aerospace.toml:144 muss geändert werden zu `ctrl-alt-shift-cmd-b`. User-Entscheidung erforderlich!
+**Bessere Lösung:** `./scripts/restart_services.sh` (enthält Lock-File-Cleanup)
+
+**Prevention:** Nutze immer `refresh-aerospace-sketchy.sh` statt manueller Restarts
 
 ### 1. Config-Desynchronisation (TOP PRIORITY!)
 
@@ -578,16 +582,18 @@ ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/aerospace.toml ~/.aerospace.toml
 ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/sketchybar ~/.config/sketchybar
 ```
 
-### 2. Sketchybar Zombie-Prozesse
+### 2. Sketchybar Zombie-Prozesse & Lock-Files
 
-**Symptom:** Workspaces nicht klickbar, mehrere Lua-Prozesse
-**Cause:** Mehrfache Restart-Versuche ohne Sleep
+**Symptom:** Workspaces nicht klickbar, mehrere Lua-Prozesse, "could not acquire lock-file"
+**Cause:** Mehrfache Restart-Versuche ohne Sleep, Zombie-Prozesse, verwaiste Lock-Files
 
 **Solution:**
 ```bash
 ./scripts/refresh-aerospace-sketchy.sh  # Soft-Reload (EMPFOHLEN)
 # ODER
-./scripts/restart_services.sh           # Force mit Zombie-Guards
+./scripts/restart_services.sh           # Force mit Zombie-Guards + Lock-Cleanup
+# ODER (manuell bei Lock-Issues)
+killall sketchybar && rm -f /tmp/sketchybar_*.lock && sketchybar
 ```
 
 **Details:** `docs/TROUBLESHOOTING.md`
@@ -624,7 +630,7 @@ ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/sketchybar ~/.config/sketchybar
 
 **⚠️ NIEMALS pushen ohne User-Anweisung!**
 
-**Rollback-Script:** `scripts/rollback-to-yabai.sh` (archiviert, Yabai nicht mehr installiert)
+**Migration Status:** Abgeschlossen (Production-ready seit 2025-11-12). Rollback nicht mehr verfügbar (Yabai deinstalliert).
 
 ## Dokumentation & Ressourcen
 
@@ -644,6 +650,7 @@ ln -s ~/MyCloud/TOOLs/aerospace+sketchy/configs/sketchybar ~/.config/sketchybar
 **Status:** ✅ ABGESCHLOSSEN - Production-ready seit 2025-11-12
 **Aerospace >> Yabai Performance** (User: "unglaublich performant")
 **Scripts-Reduktion:** 18 → 6 Core Scripts (67% weniger!)
+**Migrations-Plan:** `docs/archive/PLAN.md` (abgeschlossen 2025-11-12)
 **Aktuelle TODOs:** Siehe `scripts/ToDos.md`
 
 ## Known Issues & Maintenance

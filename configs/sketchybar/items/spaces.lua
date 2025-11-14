@@ -14,6 +14,16 @@ local separator_item = nil           -- Reference zum Separator-Item
 local reorder_pending = false        -- Debounce-Lock
 local pending_reorder_data = nil     -- Queued reorder if pending=true
 local workspace_window_counts = {}   -- workspace → window_count (shared state!)
+local workspace_visual_state = {}    -- Cache last applied drawing/color/highlight per workspace
+local workspace_icon_labels = {}     -- Cache last label string per workspace
+local last_workspace_counts = {}     -- Track previous counts for differential dimming
+local workspace_nav_order = {}       -- Current monitor-aware navigation order
+local DEFAULT_NAV_ORDER = { "Q", "W", "E", "R", "T", "A", "S", "D", "F", "G" }
+local CENTER_MOUSE_SCRIPT = "/Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh"
+
+-- Performance optimization
+local last_focused_workspace = nil   -- Track last focused to do differential updates
+local refresh_debounce_pending = false  -- Debounce for workspace_force_refresh
 
 -- Workspace labels (QWERTZ Layout + Overflow X/Y/Z)
 local workspace_labels = {
@@ -156,6 +166,135 @@ end
 local reorder_items_by_monitor_groups
 local execute_reorder_with_queue
 
+-- Cache-aware visibility update to avoid redundant Sketchybar set calls
+local function update_workspace_visuals(ws_name, target_color, is_focused)
+  local current_state = workspace_visual_state[ws_name]
+  local needs_draw_change = not current_state or current_state.drawing ~= "on"
+  local needs_color_change = not current_state or current_state.icon_color ~= target_color
+  local needs_focus_change = not current_state or current_state.is_focused ~= is_focused
+
+  if needs_draw_change or needs_color_change or needs_focus_change then
+    local payload = {
+      drawing = "on",
+      icon = {
+        color = target_color,
+        highlight = is_focused,
+        font = is_focused and {
+          family = "SF Pro Display",
+          style = "Black",
+          size = 14.0
+        } or {
+          family = settings.font.numbers,
+          style = settings.font.style_map["Regular"],
+          size = 12.0
+        }
+      },
+      label = { highlight = is_focused }
+    }
+    if spaces[ws_name] then
+      spaces[ws_name]:set(payload)
+    end
+  end
+
+  if space_paddings[ws_name] then
+    local padding_state = current_state and current_state.padding_drawing or nil
+    if padding_state ~= "on" then
+      space_paddings[ws_name]:set({ drawing = "on" })
+    end
+  end
+
+  workspace_visual_state[ws_name] = {
+    drawing = "on",
+    icon_color = target_color,
+    padding_drawing = "on",
+    is_focused = is_focused,
+  }
+end
+
+local function copy_counts_table(source)
+  local copy = {}
+  for ws, count in pairs(source) do
+    copy[ws] = count
+  end
+  return copy
+end
+
+local function update_navigation_order_from_groups(monitor_groups)
+  local order = {}
+  for _, monitor_id in ipairs(monitor_groups.monitor_order) do
+    local group = monitor_groups.groups[monitor_id]
+    for _, ws in ipairs(group.workspaces) do
+      if ws:match("^[QWERTASDFGXYZ]$") then
+        table.insert(order, ws)
+      end
+    end
+  end
+  workspace_nav_order = order
+end
+
+local function get_navigation_order()
+  if workspace_nav_order and #workspace_nav_order > 0 then
+    return workspace_nav_order
+  end
+  return DEFAULT_NAV_ORDER
+end
+
+local function build_navigation_candidates(focused_workspace)
+  local order = get_navigation_order()
+  local candidates = {}
+  for _, ws in ipairs(order) do
+    local count = workspace_window_counts[ws] or 0
+    if count > 0 or ws == focused_workspace then
+      table.insert(candidates, ws)
+    end
+  end
+  if #candidates == 0 then
+    for _, ws in ipairs(order) do
+      table.insert(candidates, ws)
+    end
+  end
+  return candidates
+end
+
+local function navigate_workspace(direction)
+  local focused = last_focused_workspace or "Q"
+  local candidates = build_navigation_candidates(focused)
+  if #candidates == 0 then
+    return
+  end
+
+  local current_index = 1
+  for i, ws in ipairs(candidates) do
+    if ws == focused then
+      current_index = i
+      break
+    end
+  end
+
+  local target_index = ((current_index - 1 + direction) % #candidates) + 1
+  local target = candidates[target_index]
+
+  if not target or target == focused then
+    return
+  end
+
+  sbar.exec("aerospace workspace " .. target)
+end
+
+local function apply_workspace_color(ws_name, focused_workspace)
+  if not spaces[ws_name] then
+    return
+  end
+
+  local count = workspace_window_counts[ws_name] or 0
+  local is_focused = ws_name == focused_workspace
+  local has_windows = count > 0
+  local target_color = has_windows and (is_focused and 0xffffffff or 0xffcad3f5)
+    or (is_focused and 0xffffffff or 0xff6e6e6e)
+
+  update_workspace_visuals(ws_name, target_color, is_focused)
+end
+
 -- Helper function to ensure workspace items exist before reorder
 local function ensure_workspace_items_exist(workspace_names)
   for _, ws_name in ipairs(workspace_names) do
@@ -231,29 +370,6 @@ local function create_workspace_item(workspace_name)
       }
     }
   })
-
-  -- Subscribe to Aerospace workspace change event
-  space:subscribe("aerospace_workspace_change", function(env)
-    local focused_workspace = env.FOCUSED_WORKSPACE
-    local selected = (focused_workspace == workspace_name)
-
-    space:set({
-      icon = {
-        highlight = selected,
-        font = selected and {
-          family = "SF Pro Display",
-          style = "Black",
-          size = 14.0
-        } or {
-          family = settings.font.numbers,
-          style = settings.font.style_map["Regular"],
-          size = 12.0
-        }
-      },
-      label = { highlight = selected },
-      background = { border_color = colors.transparent }
-    })
-  end)
 
   -- Mouse click handler for Aerospace
   space:subscribe("mouse.clicked", function(env)
@@ -371,11 +487,12 @@ end
 local space_window_observer = sbar.add("item", {
   drawing = false,
   updates = true,
-  update_freq = 2,
+  update_freq = 30,  -- Increased from 2s to 30s (reduce event spam!)
 })
-space_window_observer:subscribe("routine", function()
-  sbar.trigger("workspace_force_refresh")
-end)
+-- DISABLE routine refresh - only refresh on explicit window events
+-- space_window_observer:subscribe("routine", function()
+--   sbar.trigger("workspace_force_refresh")
+-- end)
 space_window_observer:subscribe("window_created", function(env)
   sbar.trigger("workspace_force_refresh")
 end)
@@ -383,164 +500,69 @@ space_window_observer:subscribe("window_destroyed", function(env)
   sbar.trigger("workspace_force_refresh")
 end)
 
--- Window change observer with dynamic workspace discovery
+-- ULTRA-OPTIMIZED: INSTANT workspace change handler (NO queries, NO delays!)
 space_window_observer:subscribe("aerospace_workspace_change", function(env)
-  aerospace_batch:refresh()
+  local new_focused = env.FOCUSED_WORKSPACE
 
-  -- Query with monitor information for dynamic workspace discovery
-  aerospace_batch:query_with_monitors(function(batch_data)
-    if not batch_data or not batch_data.workspaces or not batch_data.windows then
-      return
-    end
+  -- Create workspace item if it doesn't exist yet
+  if not known_workspaces[new_focused] then
+    create_workspace_item(new_focused)
+  end
 
-    -- Discover and create new workspaces dynamically
-    local workspaces_to_create = {}  -- Track workspaces that should be created
-
-    -- First pass: Filter and categorize workspaces
-    for _, workspace_info in ipairs(batch_data.workspaces) do
-      local ws_name = workspace_info.name
-
-      -- SOFT-DELETE FILTER: Count windows on this workspace
-      local window_count = 0
-      for _, window in ipairs(batch_data.windows) do
-        if window.workspace == ws_name then
-          window_count = window_count + 1
-          break  -- Found at least one window
-        end
-      end
-
-      -- Skip empty workspaces (unless it's a QWERTZ/XYZ workspace or currently focused)
-      local is_qwertz_workspace = ws_name:match("^[QWERTASDFGXYZ]$")
-      local is_focused = ws_name == batch_data.focused_workspace
-
-      if window_count == 0 and not is_qwertz_workspace and not is_focused then
-        -- Don't create/show empty numeric workspaces (soft-delete)
-        goto continue
-      end
-
-      -- Track that this workspace should be created
-      table.insert(workspaces_to_create, ws_name)
-
-      ::continue::
-    end
-
-    -- Build shared state FIRST (used by visibility + separator)
-    build_workspace_window_counts(batch_data)
-
-    -- Check if monitor topology changed
-    local monitor_groups = group_workspaces_by_monitor(batch_data)
-    local topology_changed = has_monitor_topology_changed(batch_data)
-
-    if topology_changed then
-      execute_reorder_with_queue(monitor_groups, batch_data.focused_workspace, batch_data)
-    end
-
-    -- Sort function (QWERTZ Layout order: Q W E R T A S D F G X Y Z, then numbers)
-    local function workspace_sort_key(name)
-      -- QWERTZ workspace order mapping
-      local qwertz_order = {
-        Q = "01", W = "02", E = "03", R = "04", T = "05",
-        A = "06", S = "07", D = "08", F = "09", G = "10",
-        X = "11", Y = "12", Z = "13"  -- Overflow workspaces
-      }
-
-      -- Check if it's a QWERTZ/XYZ workspace
-      if qwertz_order[name] then
-        return "0" .. qwertz_order[name]  -- QWERTZ + XYZ first
-      end
-
-      -- Numeric workspaces come after QWERTZ/XYZ
-      local num = tonumber(name)
-      if num then
-        return string.format("1%03d", num)
-      end
-
-      -- Any other workspaces (fallback)
-      return "2" .. name
-    end
-
-    -- Sort all workspaces to create
-    table.sort(workspaces_to_create, function(a, b)
-      return workspace_sort_key(a) < workspace_sort_key(b)
-    end)
-
-    -- Second pass: Create workspaces in sorted order
-    for _, ws_name in ipairs(workspaces_to_create) do
-      if not known_workspaces[ws_name] then
-        create_workspace_item(ws_name)
-      end
-    end
-
-    -- DYNAMIC VISIBILITY: Always show workspaces, but dim empty ones
-    -- Use shared workspace_window_counts (already built via build_workspace_window_counts)
-
-    -- Update visibility for all created workspace items
-    for ws_name, space_item in pairs(spaces) do
-      local has_windows = (workspace_window_counts[ws_name] or 0) > 0
-      local is_focused = ws_name == batch_data.focused_workspace
-
-      -- Dim empty workspaces (unless focused)
-      local should_dim = not has_windows and not is_focused
-
-      -- ALWAYS visible, but dim icon color for empty workspaces
-      space_item:set({
-        drawing = "on",  -- Always visible (changed from conditional!)
+  -- INSTANT UPDATE: Only visual state (color/highlight) for 2 workspaces!
+  -- NO queries, NO topology checks, NO window counts
+  if last_focused_workspace and last_focused_workspace ~= new_focused then
+    -- Old workspace: unhighlight (keep current color - will update on next force_refresh)
+    if spaces[last_focused_workspace] then
+      spaces[last_focused_workspace]:set({
         icon = {
-          color = should_dim and 0xff6e6e6e or  -- Dimmed gray (empty)
-                  (is_focused and 0xffffffff or 0xffcad3f5)  -- White (focused) / Light blue (occupied)
-        }
+          highlight = false,
+          font = {
+            family = settings.font.numbers,
+            style = settings.font.style_map["Regular"],
+            size = 12.0
+          }
+        },
+        label = { highlight = false }
       })
-
-      -- Padding always visible (prevents gaps)
-      if space_paddings[ws_name] then
-        space_paddings[ws_name]:set({ drawing = "on" })
-      end
     end
+  end
 
-    -- Update all workspaces with app icons and highlighting
-    for _, workspace_info in ipairs(batch_data.workspaces) do
-      local workspace_name = workspace_info.name
+  -- New workspace: highlight white
+  if spaces[new_focused] then
+    spaces[new_focused]:set({
+      icon = {
+        color = 0xffffffff,  -- Always white when focused
+        highlight = true,
+        font = {
+          family = "SF Pro Display",
+          style = "Black",
+          size = 14.0
+        }
+      },
+      label = { highlight = true }
+    })
+  end
 
-      if spaces[workspace_name] then
-        local icon_line = ""
-        local apps = {}
-
-        -- Collect apps for this workspace
-        for _, window in ipairs(batch_data.windows) do
-          if window.workspace == workspace_name then
-            local app = window.app or "Unknown"
-            apps[app] = (apps[app] or 0) + 1
-          end
-        end
-
-        -- Generate icon line
-        local no_app = true
-        for app, count in pairs(apps) do
-          no_app = false
-          local lookup = app_icons[app]
-          local icon = ((lookup == nil) and app_icons["Default"] or lookup)
-          icon_line = icon_line .. icon
-        end
-
-        if no_app then
-          icon_line = " —"
-        end
-
-        -- Update space display
-        sbar.animate("tanh", 10, function()
-          spaces[workspace_name]:set({ label = icon_line })
-        end)
-      end
-    end
-  end)
+  last_focused_workspace = new_focused
 end)
 
--- Subscribe workspace_force_refresh to same handler (triggered by window_created, window_destroyed, app_launched, app_terminated)
+-- OPTIMIZED: Debounced window event handler (icon updates only)
 space_window_observer:subscribe("workspace_force_refresh", function(env)
-  aerospace_batch:refresh()
+  -- Debounce: Skip if already pending
+  if refresh_debounce_pending then
+    return
+  end
 
-  -- Delay slightly so Aerospace state is consistent
+  refresh_debounce_pending = true
+
+  -- 150ms delay for Aerospace state update (window move events)
   sbar.delay(0.15, function()
+    refresh_debounce_pending = false
+
+    -- Force cache refresh for move events (query_with_monitors has no cache, but clear anyway)
+    aerospace_batch:refresh()
+
     aerospace_batch:query_with_monitors(function(batch_data)
       if not batch_data or not batch_data.workspaces or not batch_data.windows then
         return
@@ -549,33 +571,43 @@ space_window_observer:subscribe("workspace_force_refresh", function(env)
       -- Build shared state
       build_workspace_window_counts(batch_data)
 
-      -- Lightweight monitor change check (with queue-based debounce!)
+      -- Monitor topology check (only if changed)
       local topology_changed = has_monitor_topology_changed(batch_data)
-
       if topology_changed then
         local monitor_groups = group_workspaces_by_monitor(batch_data)
+        update_navigation_order_from_groups(monitor_groups)
         execute_reorder_with_queue(monitor_groups, batch_data.focused_workspace, batch_data)
       end
 
-      -- Update app icons for all workspaces
+      -- Update colors only for workspaces whose window count changed
+      local processed = {}
+      for ws_name, count in pairs(workspace_window_counts) do
+        processed[ws_name] = true
+        if last_workspace_counts[ws_name] ~= count then
+          apply_workspace_color(ws_name, batch_data.focused_workspace)
+        end
+      end
+      for ws_name, _ in pairs(last_workspace_counts) do
+        if not processed[ws_name] then
+          workspace_window_counts[ws_name] = 0
+          apply_workspace_color(ws_name, batch_data.focused_workspace)
+        end
+      end
+      last_workspace_counts = copy_counts_table(workspace_window_counts)
+
+      -- ONLY UPDATE ICONS (color updates handled above)
       for _, workspace_info in ipairs(batch_data.workspaces) do
         local workspace_name = workspace_info.name
-
-        -- Skip non-QWERTZ/XYZ workspaces
-        if not workspace_name:match("^[QWERTASDFGXYZ]$") and not workspace_name:match("^%d+$") then
-          goto continue
-        end
 
         -- Skip if workspace item doesn't exist yet
         if not spaces[workspace_name] then
           goto continue
         end
 
-        -- Build app icons for this workspace (same logic as aerospace_workspace_change)
+        -- Build app icons
         local icon_line = ""
         local apps = {}
 
-        -- Collect apps for this workspace
         for _, window in ipairs(batch_data.windows) do
           if window.workspace == workspace_name then
             local app = window.app or "Unknown"
@@ -583,7 +615,6 @@ space_window_observer:subscribe("workspace_force_refresh", function(env)
           end
         end
 
-        -- Generate icon line
         local no_app = true
         for app, count in pairs(apps) do
           no_app = false
@@ -596,16 +627,31 @@ space_window_observer:subscribe("workspace_force_refresh", function(env)
           icon_line = " —"
         end
 
-        -- Update space label
-        sbar.animate("tanh", 10, function()
+        -- Update label only if changed (cache check)
+        if workspace_icon_labels[workspace_name] ~= icon_line then
+          workspace_icon_labels[workspace_name] = icon_line
           spaces[workspace_name]:set({ label = icon_line })
-        end)
+        end
 
         ::continue::
       end
     end)
   end)
 end)
+
+-- Event-driven workspace navigation (Hyper+N/M)
+space_window_observer:subscribe("workspace_nav_next", function()
+  navigate_workspace(1)
+end)
+
+space_window_observer:subscribe("workspace_nav_prev", function()
+  navigate_workspace(-1)
+end)
+
+-- WINDOW NAVIGATION (Hyper+J/L): Now uses native AeroSpace DFS commands
+-- Directly bound in aerospace.toml: 'focus --boundaries-action wrap-around-the-workspace dfs-prev/next'
+-- DFS (Depth-First Search) follows window tree structure: top→bottom, left→right
+-- No event handlers needed - navigation is instant via aerospace.toml bindings
 
 -- Initial setup with dynamic workspace discovery
 aerospace_batch:query_with_monitors(function(batch_data)
@@ -652,6 +698,9 @@ aerospace_batch:query_with_monitors(function(batch_data)
   for _, ws_name in ipairs(all_workspaces) do
     create_workspace_item(ws_name)
   end
+
+  -- Initialize last_focused_workspace for differential updates
+  last_focused_workspace = batch_data.focused_workspace
 
   -- Trigger initial workspace change event
   if batch_data.focused_workspace then

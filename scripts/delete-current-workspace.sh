@@ -29,9 +29,9 @@ WINDOW_COUNT=$(aerospace list-windows --workspace "$CURRENT_WS" 2>/dev/null | wc
 
 if [ "$WINDOW_COUNT" -eq 0 ]; then
   echo "Workspace $CURRENT_WS is already empty"
-  # Switch to workspace 1 anyway
-  aerospace workspace 1
-  sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=1 2>/dev/null || true
+  # Switch to workspace Q (first QWERTZ workspace)
+  aerospace workspace Q
+  sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=Q 2>/dev/null || true
   exit 0
 fi
 
@@ -43,13 +43,13 @@ sleep 0.2
 aerospace close 2>/dev/null || true
 sleep 0.2
 
-# Switch to workspace 1 (or first available letter workspace)
-echo "Switching to workspace 1"
-aerospace workspace 1
+# Switch to workspace Q (first QWERTZ workspace)
+echo "Switching to workspace Q"
+aerospace workspace Q
 
 # Trigger Sketchybar refresh
 # The empty workspace filter will hide workspace $CURRENT_WS
-sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=1 2>/dev/null || true
+sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=Q 2>/dev/null || true
 
 echo "Workspace $CURRENT_WS deleted (closed $WINDOW_COUNT windows)"
 echo "Empty workspaces are now hidden in Sketchybar"

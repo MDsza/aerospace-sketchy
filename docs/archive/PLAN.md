@@ -1,9 +1,11 @@
 # MIGRATIONS-PLAN: Yabai → Aerospace + Sketchybar
 
-**Status:** Phase 5 - ABGESCHLOSSEN ✅ | Production-ready + App-Icons Instant-Update Fix
-**Letzte Aktualisierung:** 2025-11-12 19:05
+**Status:** Phase 5 - ABGESCHLOSSEN ✅ | Production-ready + All Fixes Complete
+**Letzte Aktualisierung:** 2025-11-12 20:15
 **Aktueller Schritt:** Phase 6 - Deinstallation (Soft)
-**Latest:** App-Icons Update Delay behoben (workspace_force_refresh Handler, 150ms delay, 2s polling)
+**Latest Fixes:**
+- App-Icons Instant-Update (workspace_force_refresh Handler, 150ms delay)
+- Numerische Workspaces Prevention (delete-current-workspace.sh → workspace Q)
 
 ---
 
@@ -422,16 +424,16 @@ Fenster müssen "clean" sein (kein WM) wenn neuer WM startet.
 
 **Mapping (10 feste Workspaces + Overflow):**
 ```
-Q  → Quick Notes / Obsidian / Research
-W  → Work / Citrix
-E  → Email / Messaging
-R  → Meetings / Reserved
-T  → Terminal Shared
-A  → AI / IDEs / VS Code
-S  → Search / Browser
-D  → Do / Productivity
-F  → Files / Finder
-G  → General / Sandbox
+Q  → Quick Notes:  Obsidian / Research
+W  → Work: Citrix
+E  → Email: Messaging / Outlook
+R  → Meetings: Reserved
+T  → Terminal
+A  → AI: IDEs / VS Code
+S  → Search: Browser
+D  → Do: Productivity
+F  → Files: Finder
+G  → General: ...
 Overflow (X/Y/Z) → Automatisch bei Mehrmonitorbedarf
 ```
 
@@ -629,8 +631,6 @@ local workspace_labels = {
   X = "X", Y = "Y", Z = "Z"
 }
 ```
-
-**App-Zeile:** Die Label-Spalte jedes Items wird mit Icons der aktiven Apps aus `helpers/app_icons.lua` gefüllt (z. B. Obsidian = Tropfen, Citrix = Koffer). Leere Workspaces zeigen `—`. Somit entspricht die Sketchybar-Leiste exakt dem Screenshot (Buchstabe oben, App-Icons darunter).
 
 ### Checkliste Phase 4
 
@@ -1291,6 +1291,37 @@ end)
 **Ursache:** Versteckte Fenster rendern weiter (Aerospace-Design)
 
 **Lösung:** Minimieren statt Verstecken, Apps explizit quitten
+
+### Problem: Numerische Workspaces (1, 2, 3...) erscheinen ungewollt (✅ GELÖST 2025-11-12)
+
+**Symptom:** Workspaces "1", "2", "3" tauchen auf obwohl nur QWERTZ-System (Q W E R T A S D F G + X Y Z) gewünscht
+
+**Root Cause:**
+- Aerospace erstellt jeden explizit genannten Workspace-Namen SOFORT
+- `scripts/delete-current-workspace.sh` nutzte `aerospace workspace 1` als Fallback
+- Jeder Delete-Aufruf erstellt "1" neu
+- Sketchybar zeigt alle existierenden Workspaces
+
+**Lösung:**
+```bash
+# In delete-current-workspace.sh:
+# Beide Stellen von "workspace 1" → "workspace Q" geändert
+aerospace workspace Q  # Statt workspace 1
+sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE=Q
+```
+
+**Verification:**
+```bash
+# Prüfe keine numerischen Referenzen
+rg "workspace [0-9]" --type sh --type toml --type lua
+# Nur Backup-Files erlaubt
+
+# Prüfe keine numerischen Workspaces existieren
+aerospace list-workspaces --all | grep -E "^[0-9]+$"
+# Erwartung: Leer
+```
+
+**Prevention-Regel:** NIEMALS numerische Workspaces in Scripts/Configs verwenden!
 
 ---
 

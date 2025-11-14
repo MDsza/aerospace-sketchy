@@ -36,5 +36,5 @@ else
   echo "$CURRENT_STATE" > "$LAST_NON_ACCORDION_FILE"
   aerospace layout accordion horizontal vertical
   echo "h_accordion" > "$STATE_FILE"
-  echo "[Layout] Workspace $WORKSPACE → Accordion Horizontal (Hyper+K)"
+  echo "[Layout] Workspace $WORKSPACE → Accordion Horizontal (Hyper+Comma)"
 fi

@@ -1,4 +1,0 @@
-Name       Status User     File
-atuin      none                     
-sketchybar started         wolfgang ~/Library/LaunchAgents/homebrew.mxcl.sketchybar.plist
-unbound    none                     

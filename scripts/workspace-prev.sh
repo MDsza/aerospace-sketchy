@@ -69,6 +69,11 @@ ORDERED_WS=$(echo -e "$BUILTIN_SORTED\n$EXTERNAL_SORTED" | grep -v '^$')
 OCCUPIED=$(aerospace list-windows --all --format "%{workspace}" 2>/dev/null | \
            grep -E '^[QWERTASDFGXYZ]$' | sort -u)
 
+# Ensure current workspace participates (auch wenn leer)
+if [[ -n "$CURRENT" ]] && ! echo "$OCCUPIED" | grep -q "^$CURRENT$"; then
+  OCCUPIED=$(printf "%s\n%s\n" "$OCCUPIED" "$CURRENT" | grep -v '^$' | sort -u)
+fi
+
 # Filter ordered list to only occupied
 OCCUPIED_ORDERED=""
 while read -r ws; do

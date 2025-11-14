@@ -2,34 +2,33 @@
 
 set -e  # Exit on any error
 
-# SketchyBar Reset Script v2.3.0
+# SketchyBar Reset Script v3.0.0 (Aerospace)
 #
-# Purpose: Fixes SketchyBar display issues with many spaces
+# Purpose: Fixes SketchyBar display issues
 # Usage: ./sketchybar-reset.sh
 #
 # - Kills and restarts SketchyBar with proper timing
 # - Reloads configuration
-# - Triggers YabaiIndicator refresh
-# - Fixes overlapping space icons
+# - Triggers Aerospace workspace refresh
 #
-# Author: Wolfgang (yabai-skhd-sbar Setup)
-# Version: 2.3.0 (September 2025)
+# Author: Wolfgang (aerospace+sketchy Setup)
+# Version: 3.0.0 (December 2025)
 
-echo "=== SketchyBar Reset v2.3.0 für viele Spaces ==="
+echo "=== SketchyBar Reset v3.0.0 (Aerospace) ==="
 
 # SketchyBar neustarten
 echo "1. SketchyBar wird neugestartet..."
-killall sketchybar 2>/dev/null || true
-sleep 1
-sketchybar &
-sleep 2
+brew services restart sketchybar
+sleep 3
 
 # Konfiguration neu laden
 echo "2. Konfiguration wird neu geladen..."
 sketchybar --reload
 
-echo "3. YabaiIndicator wird aktualisiert..."
-echo "refresh" | nc -U /tmp/yabai-indicator.socket 2>/dev/null || true
+# Aerospace Workspace-Refresh triggern
+echo "3. Aerospace Workspace-Status wird aktualisiert..."
+FOCUSED=$(aerospace list-workspaces --focused 2>/dev/null || echo "Q")
+sketchybar --trigger aerospace_workspace_change FOCUSED_WORKSPACE="$FOCUSED" 2>/dev/null || true
 
 echo "=== Reset abgeschlossen ==="
-echo "Die Space-Icons sollten jetzt kompakter und ohne Überlappung angezeigt werden."
+echo "Workspace-Icons sollten jetzt korrekt angezeigt werden."

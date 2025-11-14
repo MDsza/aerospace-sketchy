@@ -8,7 +8,7 @@ local settings = require("settings")
 
 -- Project path detection (same as used in other scripts)
 local HOME = os.getenv("HOME")
-local PROJECT_PATH = HOME .. "/MyCloud/TOOLs/yabai-skhd-sbar"
+local PROJECT_PATH = HOME .. "/MyCloud/TOOLs/aerospace+sketchy"
 
 -- Create the widget (always visible)
 local myping_toggle = sbar.add("item", "widgets.myping_toggle", {

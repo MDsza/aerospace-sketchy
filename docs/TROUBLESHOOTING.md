@@ -8,7 +8,6 @@
 - Sketchybar startet nicht: `could not initialize daemon! abort..`
 - Workspaces werden nicht angezeigt/nicht klickbar/nicht highlighted
 - Mehrere Lua-Prozesse laufen gleichzeitig
-- Programme-Name wird nicht aktualisiert (tritt seit Entfernen des Front-App-Items nicht mehr auf)
 
 ### Root Cause
 **Mehrfache Sketchybar-Neustart-Versuche erzeugen Zombie-Prozesse**, die das Lock-File halten:

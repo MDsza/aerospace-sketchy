@@ -25,9 +25,10 @@ accordion-padding = 30
 # SKETCHYBAR & BORDERS INTEGRATION
 # ============================================================================
 
-# Start Sketchybar and JankyBorders after Aerospace
+# Start JankyBorders after Aerospace
+# NOTE: Sketchybar is managed by brew services (not started here to avoid double-start race condition)
 after-startup-command = [
-    'exec-and-forget sketchybar',
+    # 'exec-and-forget sketchybar',  # DISABLED: brew services manages sketchybar
     'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/start-borders.sh'
 ]
 
@@ -67,81 +68,108 @@ outer.right = 5
 [mode.main.binding]
 
 # ----------------------------------------------------------------------------
-# FOCUS (Hyper + Arrow Keys) + Mouse follows + Circular wrap-around
+# FOCUS (Hyper + I/J/K/L) - K ersetzt Comma für Down
 # ----------------------------------------------------------------------------
-ctrl-alt-shift-left = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh left'
-ctrl-alt-shift-right = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh right'
-ctrl-alt-shift-up = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-and-center.sh up'
-ctrl-alt-shift-down = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-and-center.sh down'
+ctrl-alt-shift-i = 'focus --boundaries-action wrap-around-the-workspace up'
+ctrl-alt-shift-j = 'focus --boundaries-action wrap-around-the-workspace left'
+ctrl-alt-shift-k = 'focus --boundaries-action wrap-around-the-workspace down'
+ctrl-alt-shift-l = 'focus --boundaries-action wrap-around-the-workspace right'
 
-# SWAP WINDOWS (Hyper+ + Arrow Keys + J/L)
+# LAYOUT SPLITS (Hyper + Arrows)
+# ↑/↓ = Vertical Split (oben/unten aufteilen)
+# ←/→ = Horizontal Split (links/rechts aufteilen)
 # ----------------------------------------------------------------------------
-ctrl-alt-shift-cmd-left = 'move left'
-ctrl-alt-shift-cmd-right = 'move right'
-ctrl-alt-shift-cmd-up = 'move up'
-ctrl-alt-shift-cmd-down = 'move down'
+ctrl-alt-shift-up = 'layout tiles vertical horizontal'
+ctrl-alt-shift-down = 'layout tiles vertical horizontal'
+ctrl-alt-shift-left = 'layout tiles horizontal vertical'
+ctrl-alt-shift-right = 'layout tiles horizontal vertical'
 
-# SWAP WINDOWS Sequential (Hyper+ + J/L) - same as Left/Right
+# LAYOUT SPLITS (Cmd + I/J/K/L) - Aliasse ohne Hyper
+# Cmd+I/K = Vertical Split, Cmd+J/L = Horizontal Split
+# ----------------------------------------------------------------------------
+cmd-i = 'layout tiles vertical horizontal'
+cmd-k = 'layout tiles vertical horizontal'
+cmd-j = 'layout tiles horizontal vertical'
+cmd-l = 'layout tiles horizontal vertical'
+
+# MOVE WINDOWS (Hyper+ + I/J/K/L) - K ersetzt Comma für Down
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-cmd-i = 'move up'
 ctrl-alt-shift-cmd-j = 'move left'
+ctrl-alt-shift-cmd-k = 'move down'
 ctrl-alt-shift-cmd-l = 'move right'
+
+# JOIN CONTAINERS (Hyper+ + Arrows) - Merge adjacent containers
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-cmd-up = 'join-with up'
+ctrl-alt-shift-cmd-down = 'join-with down'
+ctrl-alt-shift-cmd-left = 'join-with left'
+ctrl-alt-shift-cmd-right = 'join-with right'
+
+# JOIN CONTAINERS (Opt + I/J/K/L) - Aliasse ohne Hyper
+# Opt+I/K = join up/down, Opt+J/L = join left/right
+# ----------------------------------------------------------------------------
+alt-i = 'join-with up'
+alt-k = 'join-with down'
+alt-j = 'join-with left'
+alt-l = 'join-with right'
 
 # ----------------------------------------------------------------------------
 # WORKSPACE NAVIGATION (Hyper + QWERT/ASDFG)
 # ----------------------------------------------------------------------------
 
-# Top Row: QWERT + Mouse follows
-ctrl-alt-shift-q = ['workspace Q', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-w = ['workspace W', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-e = ['workspace E', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-r = ['workspace R', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-t = ['workspace T', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+# Top Row: QWERT (center-mouse removed for performance)
+ctrl-alt-shift-q = 'workspace Q'
+ctrl-alt-shift-w = 'workspace W'
+ctrl-alt-shift-e = 'workspace E'
+ctrl-alt-shift-r = 'workspace R'
+ctrl-alt-shift-t = 'workspace T'
 
-# Home Row: ASDFG + Mouse follows
-ctrl-alt-shift-a = ['workspace A', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-s = ['workspace S', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-d = ['workspace D', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-f = ['workspace F', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
-ctrl-alt-shift-g = ['workspace G', 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/center-mouse.sh']
+# Home Row: ASDFG (center-mouse removed for performance)
+ctrl-alt-shift-a = 'workspace A'
+ctrl-alt-shift-s = 'workspace S'
+ctrl-alt-shift-d = 'workspace D'
+ctrl-alt-shift-f = 'workspace F'
+ctrl-alt-shift-g = 'workspace G'
 
-# Workspace Previous/Next (Hyper + N/M) – respektiert QWERT-Order via Scripts
-ctrl-alt-shift-n = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-prev.sh'
-ctrl-alt-shift-m = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/workspace-next.sh'
+# Workspace Previous/Next (Hyper + N/M) – Sketchybar-managed navigation (Event-based)
+ctrl-alt-shift-n = 'exec-and-forget sketchybar --trigger workspace_nav_prev'
+ctrl-alt-shift-m = 'exec-and-forget sketchybar --trigger workspace_nav_next'
 
 # ----------------------------------------------------------------------------
 # MOVE WINDOW TO WORKSPACE (Hyper+ + QWERT/ASDFG)
 # ----------------------------------------------------------------------------
 
 # Top Row: QWERT
-ctrl-alt-shift-cmd-q = 'move-node-to-workspace Q'
-ctrl-alt-shift-cmd-w = 'move-node-to-workspace W'
-ctrl-alt-shift-cmd-e = 'move-node-to-workspace E'
-ctrl-alt-shift-cmd-r = 'move-node-to-workspace R'
-ctrl-alt-shift-cmd-t = 'move-node-to-workspace T'
+ctrl-alt-shift-cmd-q = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh Q'
+ctrl-alt-shift-cmd-w = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh W'
+ctrl-alt-shift-cmd-e = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh E'
+ctrl-alt-shift-cmd-r = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh R'
+ctrl-alt-shift-cmd-t = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh T'
 
 # Home Row: ASDFG
-ctrl-alt-shift-cmd-a = 'move-node-to-workspace A'
-ctrl-alt-shift-cmd-s = 'move-node-to-workspace S'
-ctrl-alt-shift-cmd-d = 'move-node-to-workspace D'
-ctrl-alt-shift-cmd-f = 'move-node-to-workspace F'
-ctrl-alt-shift-cmd-g = 'move-node-to-workspace G'
+ctrl-alt-shift-cmd-a = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh A'
+ctrl-alt-shift-cmd-s = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh S'
+ctrl-alt-shift-cmd-d = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh D'
+ctrl-alt-shift-cmd-f = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh F'
+ctrl-alt-shift-cmd-g = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-to-workspace.sh G'
 
 # Move window to Previous/Next Workspace (Hyper+ + N/M) – QWERT-Order
 ctrl-alt-shift-cmd-n = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-prev-follow.sh'
 ctrl-alt-shift-cmd-m = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/move-next-follow.sh'
 
 # ----------------------------------------------------------------------------
-# LAYOUTS (direkt adressierbar)
+# LAYOUTS
 # ----------------------------------------------------------------------------
-ctrl-alt-shift-h = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-tiles-horizontal.sh'  # Hyper + H
-ctrl-alt-shift-v = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-tiles-vertical.sh'    # Hyper + V
-ctrl-alt-shift-k = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-accordion-toggle.sh'  # Hyper + K
+# Hyper + B → Toggle between Tiles Horizontal ↔ Tiles Vertical
+ctrl-alt-shift-b = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-toggle.sh'
+# Hyper + H → (FREI - previously Tiles Horizontal)
+# Hyper + V → (FREI - previously Tiles Vertical)
+# Hyper + Comma → Accordion Toggle
+ctrl-alt-shift-comma = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/layout-accordion-toggle.sh'
 
-# Rotation (Hyper + , / .)
-ctrl-alt-shift-comma = 'layout tiles vertical horizontal'   # Hyper + ,
-ctrl-alt-shift-period = 'layout tiles horizontal vertical'  # Hyper + .
-
-# Balance (Hyper+ + K) - Using 'o' instead since k is focus
-ctrl-alt-shift-cmd-o = 'balance-sizes'                      # Hyper+ + O (changed from K)
+# Balance Window Sizes (Hyper+ + B)
+ctrl-alt-shift-cmd-b = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/balance-toggle.sh'
 
 # ----------------------------------------------------------------------------
 # FULLSCREEN & FLOAT (Hyper + Return / Hyper+ + Return)
@@ -150,22 +178,22 @@ ctrl-alt-shift-enter = 'fullscreen'                         # Hyper + Return
 ctrl-alt-shift-cmd-enter = 'layout floating tiling'         # Hyper+ + Return (Float toggle)
 
 # ----------------------------------------------------------------------------
-# DISPLAY/MONITOR MANAGEMENT (Multi-Monitor Setup - Option 2: Dynamisch)
+# DISPLAY/MONITOR MANAGEMENT (Multi-Monitor Setup)
 # ----------------------------------------------------------------------------
 
 # WINDOW zu anderem Monitor verschieben
-ctrl-alt-shift-i = 'move-node-to-monitor --wrap-around next'   # Hyper + I → Window to next monitor
-
-# WORKSPACE zu anderem Monitor verschieben (Hauptfunktion Hyper + O)
-ctrl-alt-shift-o = ['move-workspace-to-monitor --wrap-around next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper + O → Workspace to next monitor + trigger Sketchybar
+ctrl-alt-shift-o = 'move-node-to-monitor --wrap-around next'   # Hyper + O → Window to next monitor
 
 # FOCUS zwischen Monitoren wechseln (ohne Fenster zu verschieben) + Mouse follows
 ctrl-alt-shift-u = ['exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh prev', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper + U → Focus prev monitor + trigger Sketchybar
-ctrl-alt-shift-p = ['exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-monitor-and-center.sh next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper + P → Focus next monitor + trigger Sketchybar
 
-# WORKSPACE zwischen Monitoren verschieben (Option 2 - Dynamisch!)
+# WORKSPACE zwischen Monitoren verschieben
 ctrl-alt-shift-cmd-u = ['move-workspace-to-monitor --wrap-around prev', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper+ + U → Move WS to prev monitor + trigger Sketchybar
-ctrl-alt-shift-cmd-p = ['move-workspace-to-monitor --wrap-around next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper+ + P → Move WS to next monitor + trigger Sketchybar
+ctrl-alt-shift-cmd-o = ['move-workspace-to-monitor --wrap-around next', 'exec-and-forget sketchybar --trigger workspace_force_refresh']  # Hyper+ + O → Move WS to next monitor + trigger Sketchybar
+
+# Hyper + I → (FREI - previously Window to monitor, now Hyper+O)
+# Hyper + P → (FREI - previously Focus next monitor)
+# Hyper+ + P → (FREI - previously Move WS to next monitor, now Hyper+Cmd+O)
 
 # ----------------------------------------------------------------------------
 # SYSTEM / SERVICES
@@ -175,11 +203,16 @@ ctrl-alt-shift-backslash = 'reload-config'                  # Hyper + \
 # ----------------------------------------------------------------------------
 # WINDOW CYCLING & WORKSPACE CLEANUP
 # ----------------------------------------------------------------------------
-# Hyper + J → Fokus auf vorheriges Fenster (Circular) + Mouse follows
-# NOTE: Using circular navigation - wraps around at edges (last → first, first → last)
-ctrl-alt-shift-j = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh right'
-# Hyper + L → Fokus auf nächstes Fenster (Circular) + Mouse follows
-ctrl-alt-shift-l = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/focus-circular.sh left'
+# WINDOW CYCLING (Hyper + H/;) - DFS Tree-Order Navigation
+# H = Previous window (left of IJKL), ; = Next window (right of L)
+# DFS navigation follows window tree structure (top→bottom, left→right)
+# ----------------------------------------------------------------------------
+ctrl-alt-shift-h = 'focus --boundaries-action wrap-around-the-workspace dfs-prev'
+ctrl-alt-shift-semicolon = 'focus --boundaries-action wrap-around-the-workspace dfs-next'
+
+# ----------------------------------------------------------------------------
+# WORKSPACE CLEANUP
+# ----------------------------------------------------------------------------
 # Hyper + Z → Delete current workspace (closes all windows + hides empty workspaces)
 ctrl-alt-shift-z = 'exec-and-forget /Users/wolfgang/MyCloud/TOOLs/aerospace+sketchy/scripts/delete-current-workspace.sh'
 

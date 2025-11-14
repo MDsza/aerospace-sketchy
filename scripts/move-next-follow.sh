@@ -19,6 +19,7 @@ for i in "${!QWERTZ_ORDER[@]}"; do
 
     # Move and follow
     aerospace move-node-to-workspace "$NEXT"
+    sketchybar --trigger workspace_force_refresh
     aerospace workspace "$NEXT"
     exit 0
   fi
@@ -26,4 +27,5 @@ done
 
 # Fallback: move to Q and follow
 aerospace move-node-to-workspace Q
+sketchybar --trigger workspace_force_refresh
 aerospace workspace Q
